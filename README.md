@@ -1,2 +1,3 @@
-# accenter
-Learn foreign words with accents and diacritics
+# Accenter
+
+Learn foreign words with accents and diacritics.
