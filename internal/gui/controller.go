@@ -1,11 +1,11 @@
-package main
+package accenter
 
 type guiController struct {
 	a *guiApp
 }
 
 // Create a new controller, linked to the view and the model
-func newController() *guiController {
+func NewController() *guiController {
 	c := &guiController{}
 
 	// create the view
@@ -15,7 +15,7 @@ func newController() *guiController {
 }
 
 // Create the UI and run the app.
-func (c *guiController) run() {
+func (c *guiController) Run() {
 
 	// initialize the model
 

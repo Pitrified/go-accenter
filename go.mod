@@ -1,4 +1,4 @@
-module accenter
+module example.com/accenter
 
 go 1.19
 
