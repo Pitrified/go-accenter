@@ -27,12 +27,11 @@ func (kb *keyboard) buildKeyboard() *fyne.Container {
 
 	// the letters to show
 	var rows [5][]rune
-	// rows[0] = []rune("àâéèêëîïœôùûüç")
 	rows[0] = []rune("ëïœüç")
 	rows[1] = []rune("àâéèêîôùû")
 	rows[2] = []rune("qwertyuiop")
 	rows[3] = []rune("asdfghjkl")
-	rows[4] = []rune("zxcvbnm")
+	rows[4] = []rune(" zxcvbnm<")
 
 	// prepare the rows of buttons
 	kb.keys = make([][]*widget.Button, 5)
@@ -47,12 +46,12 @@ func (kb *keyboard) buildKeyboard() *fyne.Container {
 		kb.keys[i] = make([]*widget.Button, len(r))
 
 		// build each button
-		fmt.Printf("%v %T %T %c\n", r, r, r[0], r)
+		// fmt.Printf("%v %T %T %c\n", r, r, r[0], r)
 		for ii := 0; ii < len(r); ii++ {
 
 			// get the letter in the row
 			letter := r[ii]
-			fmt.Printf("\t%v %c\n", letter, letter)
+			// fmt.Printf("\t%v %c\n", letter, letter)
 
 			// build the button
 			kb.keys[i][ii] = widget.NewButton(
@@ -102,9 +101,9 @@ func (kb *keyboard) buildKeyboard() *fyne.Container {
 		container.NewCenter(
 			container.NewHBox(
 				container.NewGridWithColumns(
-					7,
-					kb.keys[4][0], kb.keys[4][1], kb.keys[4][2], kb.keys[4][3],
-					kb.keys[4][4], kb.keys[4][5], kb.keys[4][6],
+					9,
+					kb.keys[4][0], kb.keys[4][1], kb.keys[4][2], kb.keys[4][3], kb.keys[4][4],
+					kb.keys[4][5], kb.keys[4][6], kb.keys[4][7], kb.keys[4][8],
 				),
 			),
 		),

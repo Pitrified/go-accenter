@@ -1,14 +1,14 @@
 package main
 
 import (
+	"fmt"
+
 	gui "example.com/accenter/internal/gui"
-	persist "example.com/accenter/internal/persist"
 )
 
 func main() {
+	fmt.Println("Going.")
+
 	theController := gui.NewController()
 	theController.Run()
-
-	dataPath := persist.FindDataset()
-	persist.LoadWikiRecords(dataPath)
 }
