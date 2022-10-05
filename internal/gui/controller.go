@@ -1,12 +1,24 @@
 package accenter
 
+import (
+	"fmt"
+
+	persist "example.com/accenter/internal/persist"
+	wiki "example.com/accenter/internal/wiki"
+)
+
 type guiController struct {
-	a *guiApp
+	a   *guiApp
+	wwr []wiki.WeiWikiRecord
 }
 
 // Create a new controller, linked to the view and the model
 func NewController() *guiController {
 	c := &guiController{}
+
+	// load the model
+	c.wwr = persist.LoadWeiDataset()
+	fmt.Printf("%+v\n\n", c.wwr[0])
 
 	// create the view
 	c.a = newApp(c)
