@@ -11,10 +11,14 @@ import (
 	wiki "example.com/accenter/internal/wiki"
 )
 
+// Load a dataset and attach a weight to each word.
 func LoadWeiDataset() []wiki.WeiWikiRecord {
 
-	dataPath := findDataset()
-	wikiRecords := loadWikiRecords(dataPath)
+	wikiPath := findDataset("wikiRecords")
+	wikiRecords := loadWikiRecords(wikiPath)
+
+	infoPath := findDataset("infoRecords")
+	loadInfoWords(infoPath)
 
 	wei_wrecords := make([]wiki.WeiWikiRecord, len(wikiRecords))
 	for i, wr := range wikiRecords {
@@ -24,20 +28,39 @@ func LoadWeiDataset() []wiki.WeiWikiRecord {
 	return wei_wrecords
 }
 
-func findDataset() string {
-	dataPath := filepath.Join("..", "..", "dataset", "wiki01.jsonl")
-	dataPath, err := filepath.Abs(dataPath)
-	if err != nil {
-		log.Fatal(err)
+func findDataset(which string) string {
+	switch which {
+
+	case "wikiRecords":
+		dataPath := filepath.Join("..", "..", "dataset", "wiki01.jsonl")
+		dataPath, err := filepath.Abs(dataPath)
+		if err != nil {
+			// if we cannot even built the path of the wiki data file,
+			// we have a big problem
+			log.Fatal(err)
+		}
+		fmt.Printf("Loading %s from %s\n", which, dataPath)
+		return dataPath
+
+	case "infoRecords":
+		dataPath := filepath.Join("..", "..", "dataset", "info01.json")
+		dataPath, err := filepath.Abs(dataPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Loading %s from %s\n", which, dataPath)
+		return dataPath
+
+	default:
+		// MAYBE we should return "", err ?
+		return ""
 	}
-	fmt.Println(dataPath)
-	return dataPath
 }
 
 // read a file line by line
 // https://stackoverflow.com/questions/8757389/reading-a-file-line-by-line-in-go/16615559#16615559
-func loadWikiRecords(dataPath string) []wiki.WikiRecord {
-	file, err := os.Open(dataPath)
+func loadWikiRecords(wikiPath string) []wiki.WikiRecord {
+	file, err := os.Open(wikiPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,4 +93,23 @@ func loadWikiRecords(dataPath string) []wiki.WikiRecord {
 	}
 
 	return wikiRecords
+}
+
+func loadInfoWords(infoPath string) map[string]wiki.InfoWord {
+	var infoWords map[string]wiki.InfoWord
+
+	file, err := os.Open(infoPath)
+	if err != nil {
+		log.Fatal(err)
+		// TODO check if file is missing and just return empty
+	}
+	defer file.Close()
+
+	// load the map
+
+	return infoWords
+}
+
+func saveInfoWords(infoWords map[string]wiki.InfoWord) {
+	json.Marshal(infoWords)
 }
