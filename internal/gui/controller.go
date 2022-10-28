@@ -2,13 +2,14 @@ package accenter
 
 import (
 	persist "example.com/accenter/internal/persist"
-	wiki "example.com/accenter/internal/wiki"
+	weightedrand "example.com/accenter/internal/weightedrand"
+	wiki "example.com/accenter/pkg/wiki"
 )
 
 type guiController struct {
 	a  *guiApp
 	wr map[wiki.Word]wiki.WikiRecord
-	iw map[wiki.Word]wiki.InfoWord
+	iw map[wiki.Word]weightedrand.InfoWord
 }
 
 // Create a new controller, linked to the view and the model
