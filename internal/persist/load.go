@@ -13,7 +13,14 @@ import (
 )
 
 // Load a dataset and attach a weight to each word.
-func LoadWeiDataset() []wiki.WeiWikiRecord {
+//
+// First the info, then the words.
+// Use the info to compute the weights on the fly,
+// no need for a weighted record.
+func LoadDataset() (
+	map[wiki.Word]wiki.WikiRecord,
+	map[wiki.Word]wiki.InfoWord,
+) {
 
 	wikiPath := findDataset("wikiRecords")
 	wikiRecords := loadWikiRecords(wikiPath)
@@ -23,34 +30,21 @@ func LoadWeiDataset() []wiki.WeiWikiRecord {
 	infoWords := loadInfoWords(infoPath)
 	fmt.Printf("Loaded %d InfoWord\n", len(infoWords))
 
-	wei_wrecords := make([]wiki.WeiWikiRecord, len(wikiRecords))
-	for i, wr := range wikiRecords {
-
-		// fmt.Printf("Doing %s '%s' %d\n",
-		// 	wr.Word, infoWords[wr.Word].Word,
-		// 	len(infoWords[wr.Word].Word),
-		// )
-
-		// if the word is not in the map, an empty string is returned
-		if len(infoWords[wr.Word].Word) > 0 {
-			// TODO compute the actual weight from errors and frequency
-			wei_wrecords[i] = wiki.NewWeiWikiRecord(wr, 1)
-
-		} else {
-			// assign a default weight to this record
-			wei_wrecords[i] = wiki.NewWeiWikiRecord(wr, 1)
-			// create the info about this word
-			infoWords[wr.Word] = wiki.InfoWord{
-				Word:      wr.Word,
+	// if we have some WikiRecord and no InfoWord for them create the default info
+	for word := range wikiRecords {
+		if _, ok := infoWords[word]; ok {
+			infoWords[word] = wiki.InfoWord{
+				Word:      word,
 				Errors:    0,
 				Frequency: 1,
 			}
 		}
 	}
 
+	// save the updated info
 	saveInfoWords(infoPath, infoWords)
 
-	return wei_wrecords
+	return wikiRecords, infoWords
 }
 
 func findDataset(which string) string {
@@ -86,35 +80,25 @@ func findDataset(which string) string {
 //
 // read a file line by line
 // https://stackoverflow.com/questions/8757389/reading-a-file-line-by-line-in-go/16615559#16615559
-func loadWikiRecords(wikiPath string) []wiki.WikiRecord {
+func loadWikiRecords(wikiPath string) map[wiki.Word]wiki.WikiRecord {
 	file, err := os.Open(wikiPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
-	var wikiRecords []wiki.WikiRecord
+	wikiRecords := map[wiki.Word]wiki.WikiRecord{}
 
 	scanner := bufio.NewScanner(file)
 	// optionally, resize scanner's capacity for lines over 64K
+	var result_struct wiki.WikiRecord
 	for scanner.Scan() {
 		line := scanner.Text()
-
-		// var result map[string]interface{}
-		// json.Unmarshal([]byte(line), &result)
-
-		var result_struct wiki.WikiRecord
 		json.Unmarshal([]byte(line), &result_struct)
-
-		wikiRecords = append(wikiRecords, result_struct)
-
-		// fmt.Println(line)
-		// fmt.Println(result)
-		// fmt.Printf("%+v\n\n", result_struct)
-
-		// break
+		wikiRecords[result_struct.Word] = result_struct
 	}
 
+	// I mean is it really that bad?
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
@@ -123,8 +107,8 @@ func loadWikiRecords(wikiPath string) []wiki.WikiRecord {
 }
 
 // Load the info we have for each word.
-func loadInfoWords(infoPath string) map[string]wiki.InfoWord {
-	infoWords := map[string]wiki.InfoWord{}
+func loadInfoWords(infoPath string) map[wiki.Word]wiki.InfoWord {
+	infoWords := map[wiki.Word]wiki.InfoWord{}
 
 	file, err := os.Open(infoPath)
 	if err != nil {
@@ -142,7 +126,7 @@ func loadInfoWords(infoPath string) map[string]wiki.InfoWord {
 	return infoWords
 }
 
-func saveInfoWords(infoPath string, infoWords map[string]wiki.InfoWord) {
+func saveInfoWords(infoPath string, infoWords map[wiki.Word]wiki.InfoWord) {
 
 	fmt.Printf("Saving %d InfoWord\n", len(infoWords))
 	byteValue, err := json.MarshalIndent(infoWords, "", " ")

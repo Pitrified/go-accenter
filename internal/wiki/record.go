@@ -18,7 +18,7 @@ type WikiRecord struct {
 	FormOfs  []FormOf   `json:"form_of"`
 	Pos      string     `json:"pos"`
 	Senses   []Sense    `json:"senses"`
-	Word     string     `json:"word"`
+	Word     Word       `json:"word"`
 }
 
 // Possibly not the same category as the one in Sense.
@@ -27,7 +27,7 @@ type Category struct {
 }
 
 type FormOf struct {
-	Word string `json:"word"`
+	Word Word `json:"word"`
 }
 
 type Example struct {
@@ -43,3 +43,5 @@ type Sense struct {
 	Tags       []string   `json:"tags"`
 	Topics     []string   `json:"topics"`
 }
+
+type Word string

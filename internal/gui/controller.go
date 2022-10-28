@@ -6,8 +6,9 @@ import (
 )
 
 type guiController struct {
-	a   *guiApp
-	wwr []wiki.WeiWikiRecord
+	a  *guiApp
+	wr map[wiki.Word]wiki.WikiRecord
+	iw map[wiki.Word]wiki.InfoWord
 }
 
 // Create a new controller, linked to the view and the model
@@ -15,7 +16,7 @@ func NewController() *guiController {
 	c := &guiController{}
 
 	// load the model
-	c.wwr = persist.LoadWeiDataset()
+	c.wr, c.iw = persist.LoadDataset()
 
 	// fmt.Printf("%+v\n\n", c.wwr[0])
 
