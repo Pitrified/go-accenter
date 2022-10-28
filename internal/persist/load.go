@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -16,14 +17,38 @@ func LoadWeiDataset() []wiki.WeiWikiRecord {
 
 	wikiPath := findDataset("wikiRecords")
 	wikiRecords := loadWikiRecords(wikiPath)
+	fmt.Printf("Loaded %d WikiRecord\n", len(wikiRecords))
 
 	infoPath := findDataset("infoRecords")
-	loadInfoWords(infoPath)
+	infoWords := loadInfoWords(infoPath)
+	fmt.Printf("Loaded %d InfoWord\n", len(infoWords))
 
 	wei_wrecords := make([]wiki.WeiWikiRecord, len(wikiRecords))
 	for i, wr := range wikiRecords {
-		wei_wrecords[i] = wiki.NewWeiWikiRecord(wr, 1)
+
+		// fmt.Printf("Doing %s '%s' %d\n",
+		// 	wr.Word, infoWords[wr.Word].Word,
+		// 	len(infoWords[wr.Word].Word),
+		// )
+
+		// if the word is not in the map, an empty string is returned
+		if len(infoWords[wr.Word].Word) > 0 {
+			// TODO compute the actual weight from errors and frequency
+			wei_wrecords[i] = wiki.NewWeiWikiRecord(wr, 1)
+
+		} else {
+			// assign a default weight to this record
+			wei_wrecords[i] = wiki.NewWeiWikiRecord(wr, 1)
+			// create the info about this word
+			infoWords[wr.Word] = wiki.InfoWord{
+				Word:      wr.Word,
+				Errors:    0,
+				Frequency: 1,
+			}
+		}
 	}
+
+	saveInfoWords(infoPath, infoWords)
 
 	return wei_wrecords
 }
@@ -57,6 +82,8 @@ func findDataset(which string) string {
 	}
 }
 
+// Load the wiki records.
+//
 // read a file line by line
 // https://stackoverflow.com/questions/8757389/reading-a-file-line-by-line-in-go/16615559#16615559
 func loadWikiRecords(wikiPath string) []wiki.WikiRecord {
@@ -69,7 +96,7 @@ func loadWikiRecords(wikiPath string) []wiki.WikiRecord {
 	var wikiRecords []wiki.WikiRecord
 
 	scanner := bufio.NewScanner(file)
-	// optionally, resize scanner's capacity for lines over 64K, see next example
+	// optionally, resize scanner's capacity for lines over 64K
 	for scanner.Scan() {
 		line := scanner.Text()
 
@@ -95,21 +122,37 @@ func loadWikiRecords(wikiPath string) []wiki.WikiRecord {
 	return wikiRecords
 }
 
+// Load the info we have for each word.
 func loadInfoWords(infoPath string) map[string]wiki.InfoWord {
-	var infoWords map[string]wiki.InfoWord
+	infoWords := map[string]wiki.InfoWord{}
 
 	file, err := os.Open(infoPath)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("%s\n", err)
 		// TODO check if file is missing and just return empty
+		// the error might be something else
+		return infoWords
 	}
 	defer file.Close()
 
-	// load the map
+	// load the map: read the jsonFile as a byte array
+	byteValue, _ := io.ReadAll(file)
+	json.Unmarshal([]byte(byteValue), &infoWords)
 
 	return infoWords
 }
 
-func saveInfoWords(infoWords map[string]wiki.InfoWord) {
-	json.Marshal(infoWords)
+func saveInfoWords(infoPath string, infoWords map[string]wiki.InfoWord) {
+
+	fmt.Printf("Saving %d InfoWord\n", len(infoWords))
+	byteValue, err := json.MarshalIndent(infoWords, "", " ")
+	if err != nil {
+		// I mean it's kinda bad but not a total failure
+		fmt.Printf("%s\n", err)
+	}
+	err = os.WriteFile(infoPath, byteValue, 0644)
+	if err != nil {
+		fmt.Printf("%s\n", err)
+	}
+
 }

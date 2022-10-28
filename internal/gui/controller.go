@@ -1,8 +1,6 @@
 package accenter
 
 import (
-	"fmt"
-
 	persist "example.com/accenter/internal/persist"
 	wiki "example.com/accenter/internal/wiki"
 )
@@ -18,7 +16,8 @@ func NewController() *guiController {
 
 	// load the model
 	c.wwr = persist.LoadWeiDataset()
-	fmt.Printf("%+v\n\n", c.wwr[0])
+
+	// fmt.Printf("%+v\n\n", c.wwr[0])
 
 	// create the view
 	c.a = newApp(c)

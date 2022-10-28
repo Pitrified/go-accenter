@@ -1,5 +1,6 @@
 package accenter
 
+// A WikiRecord with attached a weight, used to select which word to show.
 type WeiWikiRecord struct {
 	WikiRecord WikiRecord
 	Weight     int
@@ -12,9 +13,11 @@ func NewWeiWikiRecord(wr WikiRecord, weight int) WeiWikiRecord {
 	}
 }
 
-// we weigh the records using
-// the number of error done on this word
-// the frequency of a word, unnormalized
+// Information on the words.
+//
+// We weigh the records using:
+// - the number of error done on this word
+// - the frequency of a word, unnormalized
 type InfoWord struct {
 	Word      string `json:"w"`
 	Errors    int    `json:"e"`
