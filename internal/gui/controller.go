@@ -1,6 +1,10 @@
 package accenter
 
 import (
+	"fmt"
+	"math/rand"
+	"time"
+
 	persist "example.com/accenter/internal/persist"
 	weightedrand "example.com/accenter/internal/weightedrand"
 	wiki "example.com/accenter/pkg/wiki"
@@ -14,12 +18,17 @@ type guiController struct {
 
 // Create a new controller, linked to the view and the model
 func NewController() *guiController {
+
+	// initialize the random
+	rand.Seed(time.Now().UnixNano())
+
 	c := &guiController{}
 
 	// load the model
 	c.wr, c.iw = persist.LoadDataset()
 
-	// fmt.Printf("%+v\n\n", c.wwr[0])
+	// fmt.Printf("%+v\n", c.wr[0])
+	fmt.Printf("Picked %+v\n", weightedrand.ExtractWord(c.iw))
 
 	// create the view
 	c.a = newApp(c)
