@@ -33,7 +33,7 @@ func LoadDataset() (
 
 	// if we have some WikiRecord and no InfoWord for them create the default info
 	for word := range wikiRecords {
-		if _, ok := infoWords[word]; ok {
+		if _, ok := infoWords[word]; !ok {
 			infoWords[word] = weightedrand.InfoWord{
 				Word:      word,
 				Errors:    0,
