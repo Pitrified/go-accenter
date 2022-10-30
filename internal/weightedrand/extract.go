@@ -14,7 +14,7 @@ func ExtractWord(m map[wiki.Word]InfoWord) wiki.Word {
 
 // Pick a random key in a map.
 //
-// https://www.reddit.com/r/golang/comments/kiees6/comment/ggs5z6l/?utm_source=share&utm_medium=web2x&context=3
+// https://www.reddit.com/r/golang/comments/kiees6/comment/ggs5z6l
 func pick[K comparable, V any](m map[K]V) K {
 	i := rand.Intn(len(m))
 	for k := range m {

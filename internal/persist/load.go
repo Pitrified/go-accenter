@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
+	utils "example.com/accenter/internal/utils"
 	weightedrand "example.com/accenter/internal/weightedrand"
 	wiki "example.com/accenter/pkg/wiki"
 )
@@ -41,6 +42,10 @@ func LoadDataset() (
 			}
 		}
 	}
+
+	// FIXME should not load infowords for word we do not have in the wikirecord
+	// but then should also not delete them from the file?
+	// almost as if we needed a database...
 
 	// save the updated info
 	saveInfoWords(infoPath, infoWords)
@@ -96,7 +101,10 @@ func loadWikiRecords(wikiPath string) map[wiki.Word]wiki.WikiRecord {
 	for scanner.Scan() {
 		line := scanner.Text()
 		json.Unmarshal([]byte(line), &result_struct)
-		wikiRecords[result_struct.Word] = result_struct
+		if utils.IsAccentedWord(result_struct.Word) {
+			fmt.Printf("Adding %s\n", result_struct.Word)
+			wikiRecords[result_struct.Word] = result_struct
+		}
 	}
 
 	// I mean is it really that bad?

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	persist "example.com/accenter/internal/persist"
+	utils "example.com/accenter/internal/utils"
 	weightedrand "example.com/accenter/internal/weightedrand"
 	wiki "example.com/accenter/pkg/wiki"
 )
@@ -29,6 +30,8 @@ func NewController() *guiController {
 
 	// fmt.Printf("%+v\n", c.wr[0])
 	fmt.Printf("Picked %+v\n", weightedrand.ExtractWord(c.iw))
+
+	fmt.Printf("AL %+v\n", utils.AccentedLetters)
 
 	// create the view
 	c.a = newApp(c)
