@@ -24,7 +24,8 @@ func LoadDataset() (
 	map[wiki.Word]weightedrand.InfoWord,
 ) {
 
-	wikiPath := findDataset("wikiRecords")
+	// wikiPath := findDataset("wikiRecords10")
+	wikiPath := findDataset("wikiRecords1k")
 	wikiRecords := loadWikiRecords(wikiPath)
 	fmt.Printf("Loaded %d WikiRecord\n", len(wikiRecords))
 
@@ -53,33 +54,32 @@ func LoadDataset() (
 	return wikiRecords, infoWords
 }
 
-func findDataset(which string) string {
-	switch which {
+func findDataset(whichDataset string) string {
+	dataFol := filepath.Join("..", "..", "dataset")
 
-	case "wikiRecords":
-		dataPath := filepath.Join("..", "..", "dataset", "wiki01.jsonl")
-		dataPath, err := filepath.Abs(dataPath)
-		if err != nil {
-			// if we cannot even built the path of the wiki data file,
-			// we have a big problem
-			log.Fatal(err)
-		}
-		fmt.Printf("Loading %s from %s\n", which, dataPath)
-		return dataPath
+	dataName := ""
 
+	switch whichDataset {
+	case "wikiRecords10":
+		dataName = "wiki01.jsonl"
+	case "wikiRecords1k":
+		dataName = "kaikki.org-dictionary-French-1k-accent.jsonl"
 	case "infoRecords":
-		dataPath := filepath.Join("..", "..", "dataset", "info01.json")
-		dataPath, err := filepath.Abs(dataPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("Loading %s from %s\n", which, dataPath)
-		return dataPath
-
+		dataName = "info01.json"
 	default:
-		// MAYBE we should return "", err ?
-		return ""
+		// this is fairly bad
+		log.Fatalf("Unrecognized dataset tag to load: %s.\n", whichDataset)
 	}
+
+	dataPath := filepath.Join(dataFol, dataName)
+	dataPath, err := filepath.Abs(dataPath)
+	if err != nil {
+		// if we cannot even build the path of the wiki data file,
+		// we have a big problem
+		log.Fatal(err)
+	}
+	fmt.Printf("Loading %s from %s\n", whichDataset, dataPath)
+	return dataPath
 }
 
 // Load the wiki records.
