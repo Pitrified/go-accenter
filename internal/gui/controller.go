@@ -5,19 +5,15 @@ import (
 	"math/rand"
 	"time"
 
-	persist "example.com/accenter/internal/persist"
 	utils "example.com/accenter/internal/utils"
-	weightedrand "example.com/accenter/internal/weightedrand"
-	wiki "example.com/accenter/pkg/wiki"
 )
 
 type guiController struct {
-	a  *guiApp
-	wr map[wiki.Word]wiki.WikiRecord
-	iw map[wiki.Word]weightedrand.InfoWord
+	a *guiApp
+	m *guiModel
 }
 
-// Create a new controller, linked to the view and the model
+// Create a new controller, linked to the view and the model.
 func NewController() *guiController {
 
 	// initialize the random
@@ -25,24 +21,13 @@ func NewController() *guiController {
 
 	c := &guiController{}
 
-	// load the model
-	c.wr, c.iw = persist.LoadDataset()
-
-	// fmt.Printf("%+v\n", c.wr[0])
-	fmt.Printf("Picked %+v\n", weightedrand.ExtractWord(c.iw))
-
 	fmt.Printf("AL %+v\n", utils.AccentedLetters)
 
 	// create the view
 	c.a = newApp(c)
 
-	return c
-}
-
-// Create the UI and run the app.
-func (c *guiController) Run() {
-
 	// initialize the model
+	c.m = newModel()
 
 	// create the UI, using placeholders everywhere
 	c.a.buildUI()
@@ -52,7 +37,11 @@ func (c *guiController) Run() {
 	// the view has only placeholders
 	// c.initAll()
 
+	return c
+}
+
+// Run the app.
+func (c *guiController) Run() {
 	// run the app (will block)
 	c.a.runApp()
-
 }
