@@ -5,8 +5,10 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -15,7 +17,7 @@ type guiApp struct {
 
 	kb *keyboard
 
-	word    *widget.Label
+	word    *canvas.Text
 	glosses *widget.Label
 
 	fyneApp fyne.App
@@ -71,19 +73,14 @@ func (a *guiApp) buildUI() {
 	contKeyboard := a.kb.buildKeyboard()
 
 	// ##### MAIN SCREEN #####
+
 	// word to find
-	// a.word = widget.NewLabel("Word: .... ... ... .. .. . . (4)")
-	a.word = widget.NewLabelWithStyle(
-		"____ (4) - you actually never see this",
-		fyne.TextAlignCenter,
-		fyne.TextStyle{
-			Bold:      false,
-			Monospace: true,
-		},
-	)
-	// a.word.Alignment = fyne.TextAlignCenter
+	a.word = canvas.NewText("____ (4)", theme.ForegroundColor())
+	a.word.TextSize = 30
+	a.word.Alignment = fyne.TextAlignCenter
+	a.word.TextStyle = fyne.TextStyle{Bold: false, Monospace: true}
 	// meaning of the word
-	a.glosses = widget.NewLabel("Glosses:\none\ntwo\na very long gloss that explains a lot of information about the word")
+	a.glosses = widget.NewLabel("Glosses:")
 	a.glosses.Wrapping = fyne.TextWrapWord
 	// assemble word info
 	contWord := container.NewVBox(
@@ -92,9 +89,11 @@ func (a *guiApp) buildUI() {
 		a.glosses,
 		layout.NewSpacer(),
 	)
-	// add more elements to the screen
+
+	// elements in the bottom of the main screen
 	labelControl := widget.NewLabel("Mock for buttons: hint, next...")
 	labelControl.Alignment = fyne.TextAlignCenter
+
 	// build the main screen
 	contMain := container.NewBorder(
 		nil, labelControl, nil, nil,
@@ -102,12 +101,7 @@ func (a *guiApp) buildUI() {
 	)
 
 	// ##### ASSEMBLE #####
-	// frankly this title is useless, meh
-	labelTitle := widget.NewLabelWithStyle(
-		"Accenter", fyne.TextAlignCenter, fyne.TextStyle{Bold: true},
-	)
-	borderCont := container.NewBorder(labelTitle, contKeyboard, nil, nil,
-		// container.NewCenter(contMain),
+	borderCont := container.NewBorder(nil, contKeyboard, nil, nil,
 		container.NewPadded(contMain),
 	)
 	a.mainWin.SetContent(borderCont)
@@ -120,7 +114,8 @@ func (a *guiApp) buildUI() {
 
 // Update the word to find with the current state.
 func (a *guiApp) updateWord(word string) {
-	a.word.SetText(word)
+	a.word.Text = word
+	a.word.Refresh()
 }
 
 // Update the glosses info.
