@@ -3,11 +3,13 @@ package accenter
 import (
 	"math/rand"
 	"time"
+
+	model "example.com/accenter/internal/model"
 )
 
 type guiController struct {
 	a *guiApp
-	m *guiModel
+	m *model.GuiModel
 }
 
 // Create a new controller, linked to the view and the model.
@@ -22,7 +24,7 @@ func NewController() *guiController {
 	c.a = newApp(c)
 
 	// initialize the model
-	c.m = newModel()
+	c.m = model.NewModel()
 
 	// create the UI, using placeholders everywhere
 	c.a.buildUI()
@@ -55,10 +57,10 @@ func (c *guiController) initAll() {
 func (c *guiController) clicked(letter rune) {
 	// fmt.Printf("C: Clicked '%c'\n", letter)
 	// update the model
-	c.m.clicked(letter)
+	c.m.Clicked(letter)
 
 	// check what the click did
-	switch c.m.lastMistake {
+	switch c.m.LastMistake {
 
 	// was the right letter
 	case ' ':
@@ -74,7 +76,7 @@ func (c *guiController) clicked(letter rune) {
 
 	// was the wrong letter
 	default:
-		c.a.kb.disable(c.m.lastMistake)
+		c.a.kb.disable(c.m.LastMistake)
 
 	}
 
@@ -82,14 +84,14 @@ func (c *guiController) clicked(letter rune) {
 
 // Clicked the button requesting a hint.
 func (c *guiController) clickedHint() {
-	c.m.clickedHint()
+	c.m.ClickedHint()
 	c.updateWord()
 }
 
 // Clicked the button requesting the next word.
 func (c *guiController) clickedNext() {
 	// pick the next
-	c.m.pickNewSecretWord()
+	c.m.PickNewSecretWord()
 	// enable all the keys
 	c.a.kb.enableAll()
 	// update the view elements
@@ -99,7 +101,7 @@ func (c *guiController) clickedNext() {
 
 // Clicked the button to mark a word as useless.
 func (c *guiController) clickedUseless() {
-	c.m.clickedUseless()
+	c.m.ClickedUseless()
 	c.clickedNext()
 }
 
@@ -112,12 +114,12 @@ func (c *guiController) clickedUseless() {
 func (c *guiController) updateWord() {
 	// get the word to show from the model
 	// place it in the view
-	c.a.updateWord(c.m.showWord)
+	c.a.updateWord(c.m.ShowWord)
 }
 
 // The word info to show has changed.
 func (c *guiController) updateGlossesInfo() {
 	// get the word to show from the model
 	// place it in the view
-	c.a.updateGlossesInfo(c.m.glossesInfo)
+	c.a.updateGlossesInfo(c.m.GlossesInfo)
 }

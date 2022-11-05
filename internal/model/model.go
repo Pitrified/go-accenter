@@ -5,9 +5,7 @@ import (
 	"strings"
 	"unicode"
 
-	persist "example.com/accenter/internal/persist"
 	utils "example.com/accenter/internal/utils"
-	weightedrand "example.com/accenter/internal/weightedrand"
 	wiki "example.com/accenter/pkg/wiki"
 )
 
@@ -24,45 +22,45 @@ const (
 	hintAll                      // show real letters
 )
 
-type guiModel struct {
+type GuiModel struct {
 	wr map[wiki.Word]*wiki.WikiRecord
-	iw map[wiki.Word]*weightedrand.InfoWord
+	iw map[wiki.Word]*InfoWord
 
 	secretWord  wiki.Word // secret word to write
 	currentChar int       // index of the next letter to write
-	showWord    string    // word to show to the user
+	ShowWord    string    // word to show to the user
 	showHint    hintLevel // which kind of prompt to show
-	glossesInfo string    // glosses related to the word
+	GlossesInfo string    // glosses related to the word
 
-	lastMistake rune // some signal to communicate with the controller
+	LastMistake rune // some signal to communicate with the controller
 }
 
-func newModel() *guiModel {
+func NewModel() *GuiModel {
 	// create the model
-	m := &guiModel{}
+	m := &GuiModel{}
 
 	// load the records and the info
-	m.wr, m.iw = persist.LoadDataset()
+	m.wr, m.iw = LoadDataset()
 
 	// pick the first word to find
-	m.pickNewSecretWord()
+	m.PickNewSecretWord()
 
 	return m
 }
 
 // Pick a word to find, update the relative info.
-func (m *guiModel) pickNewSecretWord() {
+func (m *GuiModel) PickNewSecretWord() {
 	// fmt.Printf("M: Setting hintOn to false\n")
 	// this need to happen before buildShowWord
 	m.showHint = hintOff
 
-	m.secretWord = weightedrand.ExtractWord(m.iw)
+	m.secretWord = ExtractWord(m.iw)
 	// m.secretWord = "no_raw_glossës"
 	// m.secretWord = "Azraël"
 	m.currentChar = 0
 	m.buildShowWord()
 	m.buildAllGlosses()
-	m.lastMistake = ' '
+	m.LastMistake = ' '
 
 	fmt.Printf("M: Picked %+v\n", m.secretWord)
 	fmt.Printf("M: %+v\n", m.wr[m.secretWord].GetAllGlosses())
@@ -76,42 +74,42 @@ func (m *guiModel) pickNewSecretWord() {
 //
 // Show the correctly inserted prefix, then some placeholders.
 // Show the len of the word.
-func (m *guiModel) buildShowWord() {
+func (m *GuiModel) buildShowWord() {
 	// write the correct matches
 	// we only accept a char if it's correct, just copy that from the secret
 	// fill with placeholders
 	// add the len hint
 
 	// always show the real secret word we already inserted
-	m.showWord = m.secretWord.PrefixStr(m.currentChar)
+	m.ShowWord = m.secretWord.PrefixStr(m.currentChar)
 
 	switch m.showHint {
 	case hintOff:
 		// show just a placeholder char
-		m.showWord += strings.Repeat("_", m.secretWord.Len()-m.currentChar)
+		m.ShowWord += strings.Repeat("_", m.secretWord.Len()-m.currentChar)
 	case hintLetters:
 		// show unaccented letters
 		suffix := m.secretWord.Suffix(m.currentChar)
-		m.showWord += string(utils.UnaccentWord(suffix))
+		m.ShowWord += string(utils.UnaccentWord(suffix))
 	case hintAll:
 		// show real letters
-		m.showWord += m.secretWord.SuffixStr(m.currentChar)
+		m.ShowWord += m.secretWord.SuffixStr(m.currentChar)
 	}
 	// add the len of the word
-	m.showWord += fmt.Sprintf(" (%d)", m.secretWord.Len())
+	m.ShowWord += fmt.Sprintf(" (%d)", m.secretWord.Len())
 
-	// fmt.Printf("M: built %s\n", m.showWord)
+	// fmt.Printf("M: built %s\n", m.ShowWord)
 }
 
 // Build the definition of the word.
-func (m *guiModel) buildAllGlosses() {
+func (m *GuiModel) buildAllGlosses() {
 	allGlosses := m.wr[m.secretWord].GetAllGlosses()
 	allSensesGlosses := make([]string, 5)
 	for _, sense := range allGlosses {
 		thisSenseGlosses := strings.Join(sense, "\n")
 		allSensesGlosses = append(allSensesGlosses, thisSenseGlosses)
 	}
-	m.glossesInfo = strings.Join(allSensesGlosses, "\n")
+	m.GlossesInfo = strings.Join(allSensesGlosses, "\n")
 }
 
 // --------------------------------------------------------------------------------
@@ -123,7 +121,7 @@ func (m *guiModel) buildAllGlosses() {
 // If the letter is correct add it to the current word,
 // skip next chars if they are not letters (spaces, hyphens).
 // If it's wrong, mark a flag to disable wrong buttons
-func (m *guiModel) clicked(letter rune) {
+func (m *GuiModel) Clicked(letter rune) {
 	// fmt.Printf("M: Clicked '%c'\n", letter)
 
 	// get the next letter in the secret word
@@ -133,10 +131,10 @@ func (m *guiModel) clicked(letter rune) {
 	if letter == nextSecretRune || true {
 		// if it is correct, append it
 		m.currentChar += 1
-		m.lastMistake = ' '
+		m.LastMistake = ' '
 	} else {
 		// mark the mistake and exit, no need to update the rest
-		m.lastMistake = letter
+		m.LastMistake = letter
 		return
 	}
 
@@ -152,14 +150,14 @@ func (m *guiModel) clicked(letter rune) {
 
 	if m.currentChar == m.secretWord.Len() {
 		// fmt.Printf("M: You won!\n")
-		m.lastMistake = '!'
+		m.LastMistake = '!'
 	}
 
 	m.buildShowWord()
 }
 
 // Clicked the button requesting a hint.
-func (m *guiModel) clickedHint() {
+func (m *GuiModel) ClickedHint() {
 	if m.showHint < hintAll {
 		m.showHint += 1
 	}
@@ -167,10 +165,10 @@ func (m *guiModel) clickedHint() {
 }
 
 // Clicked the button to mark a word as useless.
-func (m *guiModel) clickedUseless() {
+func (m *GuiModel) ClickedUseless() {
 	m.iw[m.secretWord].Useless = true
-	infoPath := persist.FindDataset("infoRecords")
-	persist.SaveInfoWords(infoPath, m.iw)
+	infoPath := FindDataset("infoRecords")
+	SaveInfoWords(infoPath, m.iw)
 }
 
 // TODO move model to internal/model/model.go

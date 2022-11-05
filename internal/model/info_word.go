@@ -1,6 +1,7 @@
 package accenter
 
 import (
+	rand "example.com/accenter/pkg/rand"
 	wiki "example.com/accenter/pkg/wiki"
 )
 
@@ -33,3 +34,9 @@ type InfoWord struct {
 }
 
 // basically we are reinventing a database, the key is the word
+
+// given a map of InfoWord
+// pick one according to some logic
+func ExtractWord(m map[wiki.Word]*InfoWord) wiki.Word {
+	return rand.Pick(m)
+}

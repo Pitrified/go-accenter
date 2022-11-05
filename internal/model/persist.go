@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 
 	utils "example.com/accenter/internal/utils"
-	weightedrand "example.com/accenter/internal/weightedrand"
 	wiki "example.com/accenter/pkg/wiki"
 )
 
@@ -21,7 +20,7 @@ import (
 // no need for a weighted record.
 func LoadDataset() (
 	map[wiki.Word]*wiki.WikiRecord,
-	map[wiki.Word]*weightedrand.InfoWord,
+	map[wiki.Word]*InfoWord,
 ) {
 
 	// wikiPath := findDataset("wikiRecords10")
@@ -36,7 +35,7 @@ func LoadDataset() (
 	// if we have some WikiRecord and no InfoWord for them create the default info
 	for word := range wikiRecords {
 		if _, ok := infoWords[word]; !ok {
-			infoWords[word] = &weightedrand.InfoWord{
+			infoWords[word] = &InfoWord{
 				Word:      word,
 				Errors:    0,
 				Frequency: 1,
@@ -116,8 +115,8 @@ func loadWikiRecords(wikiPath string) map[wiki.Word]*wiki.WikiRecord {
 }
 
 // Load the info we have for each word.
-func loadInfoWords(infoPath string) map[wiki.Word]*weightedrand.InfoWord {
-	infoWords := map[wiki.Word]*weightedrand.InfoWord{}
+func loadInfoWords(infoPath string) map[wiki.Word]*InfoWord {
+	infoWords := map[wiki.Word]*InfoWord{}
 
 	file, err := os.Open(infoPath)
 	if err != nil {
@@ -135,7 +134,7 @@ func loadInfoWords(infoPath string) map[wiki.Word]*weightedrand.InfoWord {
 	return infoWords
 }
 
-func SaveInfoWords(infoPath string, infoWords map[wiki.Word]*weightedrand.InfoWord) {
+func SaveInfoWords(infoPath string, infoWords map[wiki.Word]*InfoWord) {
 
 	fmt.Printf("Saving %d InfoWord\n", len(infoWords))
 	byteValue, err := json.MarshalIndent(infoWords, "", " ")
