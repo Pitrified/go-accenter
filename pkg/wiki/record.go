@@ -45,3 +45,35 @@ type Sense struct {
 }
 
 type Word string
+
+// Get all the Glosses for this record.
+//
+// For each sense in the record,
+// if there are RawGlosses, return those,
+// else return the Glosses.
+func (wr *WikiRecord) GetAllGlosses() [][]string {
+	allGlosses := make([][]string, len(wr.Senses))
+	for si, sense := range wr.Senses {
+		// allGlosses[si] = make([]string, sense.numGlosses())
+		allGlosses[si] = sense.GetGlosses()
+	}
+	return allGlosses
+}
+
+// Return the RawGlosses if available, else the Glosses.
+func (s *Sense) GetGlosses() []string {
+	if len(s.RawGlosses) > 0 {
+		return s.RawGlosses
+	} else {
+		return s.Glosses
+	}
+}
+
+// Get the number of RawGlosses, if any, else the number of Glosses.
+func (s *Sense) NumGlosses() int {
+	if len(s.RawGlosses) > 0 {
+		return len(s.RawGlosses)
+	} else {
+		return len(s.Glosses)
+	}
+}

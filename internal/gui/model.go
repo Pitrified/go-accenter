@@ -37,7 +37,8 @@ func newModel() *guiModel {
 	m.buildShowWord()
 
 	fmt.Printf("Picked %+v\n", m.secretWord)
-	fmt.Printf("%+v\n", m.wr[m.secretWord].Senses[0].RawGlosses)
+	// fmt.Printf("%+v\n", m.wr[m.secretWord].Senses[0].RawGlosses)
+	fmt.Printf("%+v\n", m.wr[m.secretWord].GetAllGlosses())
 
 	return m
 }
