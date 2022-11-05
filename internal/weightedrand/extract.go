@@ -6,7 +6,7 @@ import (
 	wiki "example.com/accenter/pkg/wiki"
 )
 
-// given a map of infoword
+// given a map of InfoWord
 // pick one according to some logic
 func ExtractWord(m map[wiki.Word]*InfoWord) wiki.Word {
 	return pick(m)

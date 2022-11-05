@@ -5,7 +5,7 @@ import (
 	"unicode/utf8"
 )
 
-// Wikidictionary record.
+// WikiDictionary record.
 //
 // '#categories>#name',
 // '#form_of>#word',

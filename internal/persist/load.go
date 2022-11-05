@@ -25,11 +25,11 @@ func LoadDataset() (
 ) {
 
 	// wikiPath := findDataset("wikiRecords10")
-	wikiPath := findDataset("wikiRecords1k")
+	wikiPath := FindDataset("wikiRecords1k")
 	wikiRecords := loadWikiRecords(wikiPath)
 	fmt.Printf("Loaded %d WikiRecord\n", len(wikiRecords))
 
-	infoPath := findDataset("infoRecords")
+	infoPath := FindDataset("infoRecords")
 	infoWords := loadInfoWords(infoPath)
 	fmt.Printf("Loaded %d InfoWord\n", len(infoWords))
 
@@ -44,17 +44,17 @@ func LoadDataset() (
 		}
 	}
 
-	// FIXME should not load infowords for word we do not have in the wikirecord
+	// FIXME should not load InfoWords for word we do not have in the WikiRecord
 	// but then should also not delete them from the file?
 	// almost as if we needed a database...
 
 	// save the updated info
-	saveInfoWords(infoPath, infoWords)
+	SaveInfoWords(infoPath, infoWords)
 
 	return wikiRecords, infoWords
 }
 
-func findDataset(whichDataset string) string {
+func FindDataset(whichDataset string) string {
 	dataFol := filepath.Join("..", "..", "dataset")
 
 	dataName := ""
@@ -135,7 +135,7 @@ func loadInfoWords(infoPath string) map[wiki.Word]*weightedrand.InfoWord {
 	return infoWords
 }
 
-func saveInfoWords(infoPath string, infoWords map[wiki.Word]*weightedrand.InfoWord) {
+func SaveInfoWords(infoPath string, infoWords map[wiki.Word]*weightedrand.InfoWord) {
 
 	fmt.Printf("Saving %d InfoWord\n", len(infoWords))
 	byteValue, err := json.MarshalIndent(infoWords, "", " ")

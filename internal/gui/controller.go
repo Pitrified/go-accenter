@@ -97,6 +97,12 @@ func (c *guiController) clickedNext() {
 	c.updateGlossesInfo()
 }
 
+// Clicked the button to mark a word as useless.
+func (c *guiController) clickedUseless() {
+	c.m.clickedUseless()
+	c.clickedNext()
+}
+
 // --------------------------------------------------------------------------------
 //  The model has changed:
 //  the controller knows which view elements must be updated.

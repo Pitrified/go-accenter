@@ -31,7 +31,7 @@ var UnaccentLetterMap = map[rune]rune{
 	'Ç': 'C',
 }
 
-// Return the unaccented verision of the rune.
+// Return the unaccented version of the rune.
 func UnaccentLetter(r rune) rune {
 	ur := UnaccentLetterMap[r]
 	if ur != 0 {
@@ -41,7 +41,7 @@ func UnaccentLetter(r rune) rune {
 	}
 }
 
-// Return the unaccented verion of the word.
+// Return the unaccented version of the word.
 func UnaccentWord(word wiki.Word) wiki.Word {
 	return wiki.Word(strings.Map(UnaccentLetter, string(word)))
 }

@@ -124,7 +124,7 @@ func (kb *keyboard) buildKeyboard() *fyne.Container {
 //  callbacks to communicate with the Controller
 // -------------------------------------------------------------------
 
-// Clicked one of the keyoard buttons.
+// Clicked one of the keyboard buttons.
 func (kb *keyboard) keysCB(letter rune) {
 	// fmt.Printf("K: Clicked '%c'\n", letter)
 	kb.a.c.clicked(letter)

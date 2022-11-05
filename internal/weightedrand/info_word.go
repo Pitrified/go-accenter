@@ -21,7 +21,7 @@ import (
 //
 // We weigh the records using:
 // - the number of error done on this word
-// - the frequency of a word, unnormalized
+// - the frequency of a word, un-normalized
 //
 // TODO Skip a word if it's marked as useless
 // TODO Save how many time a word was shown, heavily boost those at 0

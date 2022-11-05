@@ -165,3 +165,17 @@ func (m *guiModel) clickedHint() {
 	}
 	m.buildShowWord()
 }
+
+// Clicked the button to mark a word as useless.
+func (m *guiModel) clickedUseless() {
+	m.iw[m.secretWord].Useless = true
+	infoPath := persist.FindDataset("infoRecords")
+	persist.SaveInfoWords(infoPath, m.iw)
+}
+
+// TODO move model to internal/model/model.go
+// and place persist/load.go in model/load.go (as funcs of guiModel)
+// weighted_rand split as well:
+// move extract.pick to pkg/rand
+// extract.ExtractWord to model/info_word.go
+// and extract.ComputeWeight to model/info_word.go

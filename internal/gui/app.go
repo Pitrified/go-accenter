@@ -20,8 +20,9 @@ type guiApp struct {
 	word    *canvas.Text
 	glosses *widget.Label
 
-	hint *widget.Button
-	next *widget.Button
+	hint    *widget.Button
+	next    *widget.Button
+	useless *widget.Button
 
 	fyneApp fyne.App
 	mainWin fyne.Window
@@ -96,7 +97,10 @@ func (a *guiApp) buildUI() {
 	// elements in the bottom of the main screen
 	a.hint = widget.NewButton("Hint", a.hintCB)
 	a.next = widget.NewButton("Next", a.nextCB)
-	contControl := container.NewGridWithColumns(2, a.hint, a.next)
+	a.useless = widget.NewButton("Useless", a.uselessCB)
+	contControl := container.NewGridWithColumns(3,
+		a.hint, a.useless, a.next,
+	)
 
 	// build the main screen
 	contMain := container.NewBorder(
@@ -125,6 +129,12 @@ func (a *guiApp) hintCB() {
 // Clicked the button requesting a next.
 func (a *guiApp) nextCB() {
 	a.c.clickedNext()
+}
+
+// Clicked the button to mark a word as useless.
+func (a *guiApp) uselessCB() {
+	// TODO ask for confirmation
+	a.c.clickedUseless()
 }
 
 // -------------------------------------------------------------------
