@@ -68,12 +68,7 @@ func (c *guiController) clicked(letter rune) {
 	// all the word is correct
 	case '!':
 		// fmt.Printf("C: You won!\n")
-		// pick the next
-		c.m.pickNewSecretWord()
-		// enable all the keys
-		c.a.kb.enableAll()
-		c.updateWord()
-		c.updateGlossesInfo()
+		c.clickedNext()
 
 	// was the wrong letter
 	default:
@@ -87,6 +82,17 @@ func (c *guiController) clicked(letter rune) {
 func (c *guiController) clickedHint() {
 	c.m.clickedHint()
 	c.updateWord()
+}
+
+// Clicked the button requesting the next word.
+func (c *guiController) clickedNext() {
+	// pick the next
+	c.m.pickNewSecretWord()
+	// enable all the keys
+	c.a.kb.enableAll()
+	// update the view elements
+	c.updateWord()
+	c.updateGlossesInfo()
 }
 
 // --------------------------------------------------------------------------------

@@ -20,7 +20,8 @@ type guiApp struct {
 	word    *canvas.Text
 	glosses *widget.Label
 
-	hint *widget.Button
+	hint *widget.Button // TODO if pressed twice show the accented word
+	next *widget.Button
 
 	fyneApp fyne.App
 	mainWin fyne.Window
@@ -93,13 +94,13 @@ func (a *guiApp) buildUI() {
 	)
 
 	// elements in the bottom of the main screen
-	labelControl := widget.NewLabel("Mock for buttons: hint, next...")
-	labelControl.Alignment = fyne.TextAlignCenter
 	a.hint = widget.NewButton("Hint", a.hintCB)
+	a.next = widget.NewButton("Next", a.nextCB)
+	contControl := container.NewGridWithColumns(2, a.hint, a.next)
 
 	// build the main screen
 	contMain := container.NewBorder(
-		nil, a.hint, nil, nil,
+		nil, contControl, nil, nil,
 		contWord,
 	)
 
@@ -119,6 +120,11 @@ func (a *guiApp) buildUI() {
 // Clicked the button requesting a hint.
 func (a *guiApp) hintCB() {
 	a.c.clickedHint()
+}
+
+// Clicked the button requesting a next.
+func (a *guiApp) nextCB() {
+	a.c.clickedNext()
 }
 
 // -------------------------------------------------------------------
