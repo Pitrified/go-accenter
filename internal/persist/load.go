@@ -20,8 +20,8 @@ import (
 // Use the info to compute the weights on the fly,
 // no need for a weighted record.
 func LoadDataset() (
-	map[wiki.Word]wiki.WikiRecord,
-	map[wiki.Word]weightedrand.InfoWord,
+	map[wiki.Word]*wiki.WikiRecord,
+	map[wiki.Word]*weightedrand.InfoWord,
 ) {
 
 	// wikiPath := findDataset("wikiRecords10")
@@ -36,7 +36,7 @@ func LoadDataset() (
 	// if we have some WikiRecord and no InfoWord for them create the default info
 	for word := range wikiRecords {
 		if _, ok := infoWords[word]; !ok {
-			infoWords[word] = weightedrand.InfoWord{
+			infoWords[word] = &weightedrand.InfoWord{
 				Word:      word,
 				Errors:    0,
 				Frequency: 1,
@@ -86,14 +86,14 @@ func findDataset(whichDataset string) string {
 //
 // read a file line by line
 // https://stackoverflow.com/questions/8757389/reading-a-file-line-by-line-in-go/16615559#16615559
-func loadWikiRecords(wikiPath string) map[wiki.Word]wiki.WikiRecord {
+func loadWikiRecords(wikiPath string) map[wiki.Word]*wiki.WikiRecord {
 	file, err := os.Open(wikiPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
-	wikiRecords := map[wiki.Word]wiki.WikiRecord{}
+	wikiRecords := map[wiki.Word]*wiki.WikiRecord{}
 
 	scanner := bufio.NewScanner(file)
 	// optionally, resize scanner's capacity for lines over 64K
@@ -103,7 +103,7 @@ func loadWikiRecords(wikiPath string) map[wiki.Word]wiki.WikiRecord {
 		json.Unmarshal([]byte(line), &result_struct)
 		if utils.IsAccentedWord(result_struct.Word) {
 			// fmt.Printf("Adding %s\n", result_struct.Word)
-			wikiRecords[result_struct.Word] = result_struct
+			wikiRecords[result_struct.Word] = &result_struct
 		}
 	}
 
@@ -116,8 +116,8 @@ func loadWikiRecords(wikiPath string) map[wiki.Word]wiki.WikiRecord {
 }
 
 // Load the info we have for each word.
-func loadInfoWords(infoPath string) map[wiki.Word]weightedrand.InfoWord {
-	infoWords := map[wiki.Word]weightedrand.InfoWord{}
+func loadInfoWords(infoPath string) map[wiki.Word]*weightedrand.InfoWord {
+	infoWords := map[wiki.Word]*weightedrand.InfoWord{}
 
 	file, err := os.Open(infoPath)
 	if err != nil {
@@ -135,7 +135,7 @@ func loadInfoWords(infoPath string) map[wiki.Word]weightedrand.InfoWord {
 	return infoWords
 }
 
-func saveInfoWords(infoPath string, infoWords map[wiki.Word]weightedrand.InfoWord) {
+func saveInfoWords(infoPath string, infoWords map[wiki.Word]*weightedrand.InfoWord) {
 
 	fmt.Printf("Saving %d InfoWord\n", len(infoWords))
 	byteValue, err := json.MarshalIndent(infoWords, "", " ")

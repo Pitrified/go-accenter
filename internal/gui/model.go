@@ -10,8 +10,8 @@ import (
 )
 
 type guiModel struct {
-	wr map[wiki.Word]wiki.WikiRecord
-	iw map[wiki.Word]weightedrand.InfoWord
+	wr map[wiki.Word]*wiki.WikiRecord
+	iw map[wiki.Word]*weightedrand.InfoWord
 
 	secretWord    wiki.Word
 	secretWordLen int

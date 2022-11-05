@@ -8,7 +8,7 @@ import (
 
 // given a map of infoword
 // pick one according to some logic
-func ExtractWord(m map[wiki.Word]InfoWord) wiki.Word {
+func ExtractWord(m map[wiki.Word]*InfoWord) wiki.Word {
 	return pick(m)
 }
 
