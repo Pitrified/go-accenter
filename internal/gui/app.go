@@ -122,3 +122,8 @@ func (a *guiApp) buildUI() {
 func (a *guiApp) updateWord(word string) {
 	a.word.SetText(word)
 }
+
+// Update the glosses info.
+func (a *guiApp) updateGlossesInfo(glosses string) {
+	a.glosses.SetText(glosses)
+}

@@ -44,6 +44,7 @@ func (c *guiController) Run() {
 
 func (c *guiController) initAll() {
 	c.updateWord()
+	c.updateGlossesInfo()
 }
 
 // --------------------------------------------------------------------------------
@@ -70,4 +71,11 @@ func (c *guiController) updateWord() {
 	// get the word to show from the model
 	// place it in the view
 	c.a.updateWord(c.m.showWord)
+}
+
+// The word info to show has changed.
+func (c *guiController) updateGlossesInfo() {
+	// get the word to show from the model
+	// place it in the view
+	c.a.updateGlossesInfo(c.m.glossesInfo)
 }

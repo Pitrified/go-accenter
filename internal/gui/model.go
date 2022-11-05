@@ -17,6 +17,7 @@ type guiModel struct {
 	secretWordLen int
 	currentWord   string
 	showWord      string
+	glossesInfo   string
 }
 
 func newModel() *guiModel {
@@ -35,6 +36,7 @@ func newModel() *guiModel {
 	m.secretWordLen = len(m.secretWord)
 	m.currentWord = ""
 	m.buildShowWord()
+	m.buildAllGlosses()
 
 	fmt.Printf("Picked %+v\n", m.secretWord)
 	// fmt.Printf("%+v\n", m.wr[m.secretWord].Senses[0].RawGlosses)
@@ -58,6 +60,17 @@ func (m *guiModel) buildShowWord() {
 	m.showWord = strings.Repeat("_", m.secretWordLen)
 	m.showWord += fmt.Sprintf(" (%d)", m.secretWordLen)
 	fmt.Printf("M: built %s\n", m.showWord)
+}
+
+// Build the definition of the word.
+func (m *guiModel) buildAllGlosses() {
+	allGlosses := m.wr[m.secretWord].GetAllGlosses()
+	allSensesGlosses := make([]string, 5)
+	for _, sense := range allGlosses {
+		thisSenseGlosses := strings.Join(sense, "\n")
+		allSensesGlosses = append(allSensesGlosses, thisSenseGlosses)
+	}
+	m.glossesInfo += strings.Join(allSensesGlosses, "\n")
 }
 
 // --------------------------------------------------------------------------------
