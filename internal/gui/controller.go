@@ -68,8 +68,9 @@ func (c *guiController) clicked(letter rune) {
 	// all the word is correct
 	case '!':
 		// fmt.Printf("C: You won!\n")
-		// TODO disable all keyboard buttons, user will press next
-		c.clickedNext()
+		// disable all keyboard buttons, user will press next
+		c.a.kb.disableAll()
+		c.updateWord()
 
 	// was the wrong letter
 	default:

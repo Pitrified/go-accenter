@@ -142,6 +142,13 @@ func (kb *keyboard) enableAll() {
 	}
 }
 
+// Disable all the keyboard buttons.
+func (kb *keyboard) disableAll() {
+	for _, button := range kb.keys {
+		button.Disable()
+	}
+}
+
 // Disable the requested keyboard button.
 func (kb *keyboard) disable(letter rune) {
 	kb.keys[letter].Disable()
