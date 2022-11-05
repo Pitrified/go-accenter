@@ -22,10 +22,13 @@ import (
 // We weigh the records using:
 // - the number of error done on this word
 // - the frequency of a word, unnormalized
+//
+// Skip a word if it's marked as useless. TODO
 type InfoWord struct {
 	Word      wiki.Word `json:"w"`
 	Errors    int       `json:"e"`
 	Frequency int       `json:"f"`
+	Useless   bool      `json:"u"`
 }
 
 // basically we are reinventing a database, the key is the word
