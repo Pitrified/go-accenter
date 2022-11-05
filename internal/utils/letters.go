@@ -8,24 +8,21 @@ import (
 	mapset "github.com/deckarep/golang-set/v2"
 )
 
-var AccentedLetters = createAccentedSet()
+var AccentedLetters = "âàéèëêïîôœüùûç"
+var AccentedLettersSet = mapset.NewSet([]rune(AccentedLetters)...)
 
-func createAccentedSet() mapset.Set[rune] {
-	accentedLettersSet := mapset.NewSet[rune]()
-	// accentedLettersSlice := []rune("âàéèëêïîôœüùûç")
-	// for _, letter := range accentedLettersSlice {
-	for _, letter := range "âàéèëêïîôœüùûç" {
-		// fmt.Printf("\t%v %c\n", letter, letter)
-		accentedLettersSet.Add(letter)
-		// or we could call unicode.ToLower() when checking
-		// accentedLettersSet.Add(unicode.ToUpper(letter))
-	}
-	return accentedLettersSet
-}
+var StandardLetters = "qwertyuiopasdfghjklzxcvbnm"
+var AllLetters = AccentedLetters + StandardLetters
 
+// Return true if letter is accented.
+//
+// or we could convert the string to lower,
+// turn it into a set,
+// compute the intersection,
+// check the len.
 func IsAccentedLetter(letter rune) bool {
 	lowLetter := unicode.ToLower(letter)
-	return AccentedLetters.Contains(lowLetter)
+	return AccentedLettersSet.Contains(lowLetter)
 }
 
 func IsAccentedWord(word wiki.Word) bool {

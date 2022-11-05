@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"unicode"
 
+	utils "example.com/accenter/internal/utils"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -13,7 +15,7 @@ import (
 type keyboard struct {
 	a *guiApp
 
-	keys [][]*widget.Button
+	keys map[rune]*widget.Button
 }
 
 // Create a new keyboard.
@@ -25,39 +27,15 @@ func newKeyboard(a *guiApp) *keyboard {
 // àÀ âÂ éÉ èÈ êÊ ëË îÎ ïÏ œŒ ôÔ ùÙ ûÛ üÜ çÇ « » €
 func (kb *keyboard) buildKeyboard() *fyne.Container {
 
-	// the letters to show
-	var rows [5][]rune
-	rows[0] = []rune("âàéèëê")
-	rows[1] = []rune("ïîôœüùûç")
-	rows[2] = []rune("qwertyuiop")
-	rows[3] = []rune("asdfghjkl")
-	rows[4] = []rune(" zxcvbnm<")
+	// allLetters := "âàéèëêïîôœüùûçqwertyuiopasdfghjklzxcvbnm"
+	kb.keys = make(map[rune]*widget.Button)
 
-	// prepare the rows of buttons
-	kb.keys = make([][]*widget.Button, 5)
-
-	// iterate over each row
-	for i := 0; i < len(rows); i++ {
-		row := rows[i]
-
-		// prepare the button row
-		kb.keys[i] = make([]*widget.Button, len(row))
-
-		// build each button
-		// fmt.Printf("%v %T %T %c\n", row, row, row[0], row)
-		for ii := 0; ii < len(row); ii++ {
-
-			// get the letter in the row
-			letter := row[ii]
-			// fmt.Printf("\t%v %c\n", letter, letter)
-
-			// build the button
-			kb.keys[i][ii] = widget.NewButton(
-				fmt.Sprintf("%c", unicode.ToUpper(letter)),
-				func() { kb.keysCB(letter) },
-			)
-
-		}
+	for _, letter := range utils.AllLetters {
+		letter := letter
+		kb.keys[letter] = widget.NewButton(
+			fmt.Sprintf("%c", unicode.ToUpper(letter)),
+			func() { kb.keysCB(letter) },
+		)
 	}
 
 	contKeys := container.NewVBox(
@@ -65,8 +43,12 @@ func (kb *keyboard) buildKeyboard() *fyne.Container {
 			container.NewHBox(
 				container.NewGridWithColumns(
 					6,
-					kb.keys[0][0], kb.keys[0][1], kb.keys[0][2], kb.keys[0][3], kb.keys[0][4],
-					kb.keys[0][5],
+					kb.keys['â'],
+					kb.keys['à'],
+					kb.keys['é'],
+					kb.keys['è'],
+					kb.keys['ë'],
+					kb.keys['ê'],
 				),
 			),
 		),
@@ -74,8 +56,14 @@ func (kb *keyboard) buildKeyboard() *fyne.Container {
 			container.NewHBox(
 				container.NewGridWithColumns(
 					8,
-					kb.keys[1][0], kb.keys[1][1], kb.keys[1][2], kb.keys[1][3], kb.keys[1][4],
-					kb.keys[1][5], kb.keys[1][6], kb.keys[1][7],
+					kb.keys['ï'],
+					kb.keys['î'],
+					kb.keys['ô'],
+					kb.keys['œ'],
+					kb.keys['ü'],
+					kb.keys['ù'],
+					kb.keys['û'],
+					kb.keys['ç'],
 				),
 			),
 		),
@@ -83,8 +71,16 @@ func (kb *keyboard) buildKeyboard() *fyne.Container {
 			container.NewHBox(
 				container.NewGridWithColumns(
 					10,
-					kb.keys[2][0], kb.keys[2][1], kb.keys[2][2], kb.keys[2][3], kb.keys[2][4],
-					kb.keys[2][5], kb.keys[2][6], kb.keys[2][7], kb.keys[2][8], kb.keys[2][9],
+					kb.keys['q'],
+					kb.keys['w'],
+					kb.keys['e'],
+					kb.keys['r'],
+					kb.keys['t'],
+					kb.keys['y'],
+					kb.keys['u'],
+					kb.keys['i'],
+					kb.keys['o'],
+					kb.keys['p'],
 				),
 			),
 		),
@@ -92,17 +88,29 @@ func (kb *keyboard) buildKeyboard() *fyne.Container {
 			container.NewHBox(
 				container.NewGridWithColumns(
 					9,
-					kb.keys[3][0], kb.keys[3][1], kb.keys[3][2], kb.keys[3][3], kb.keys[3][4],
-					kb.keys[3][5], kb.keys[3][6], kb.keys[3][7], kb.keys[3][8],
+					kb.keys['a'],
+					kb.keys['s'],
+					kb.keys['d'],
+					kb.keys['f'],
+					kb.keys['g'],
+					kb.keys['h'],
+					kb.keys['j'],
+					kb.keys['k'],
+					kb.keys['l'],
 				),
 			),
 		),
 		container.NewCenter(
 			container.NewHBox(
 				container.NewGridWithColumns(
-					9,
-					kb.keys[4][0], kb.keys[4][1], kb.keys[4][2], kb.keys[4][3], kb.keys[4][4],
-					kb.keys[4][5], kb.keys[4][6], kb.keys[4][7], kb.keys[4][8],
+					7,
+					kb.keys['z'],
+					kb.keys['x'],
+					kb.keys['c'],
+					kb.keys['v'],
+					kb.keys['b'],
+					kb.keys['n'],
+					kb.keys['m'],
 				),
 			),
 		),
