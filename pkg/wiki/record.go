@@ -71,6 +71,14 @@ func (w Word) PrefixStr(prefixLen int) string {
 	return string(w.Prefix(prefixLen))
 }
 
+func (w Word) Suffix(start int) Word {
+	if start < 0 || start > w.Len() {
+		// not perfect but meh
+		return w
+	}
+	return Word([]rune(w)[start:])
+}
+
 func (w Word) RuneAt(pos int) (rune, error) {
 	if pos < 0 || pos > w.Len() {
 		return ' ', errors.New("tried to get rune out of the word")

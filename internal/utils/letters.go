@@ -13,6 +13,7 @@ var AccentedLettersSet = mapset.NewSet([]rune(AccentedLetters)...)
 
 var StandardLetters = "qwertyuiopasdfghjklzxcvbnm"
 var AllLetters = AccentedLetters + StandardLetters
+var AllLettersSet = mapset.NewSet([]rune(AllLetters)...)
 
 // Return true if letter is accented.
 //

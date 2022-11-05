@@ -120,11 +120,29 @@ func (kb *keyboard) buildKeyboard() *fyne.Container {
 }
 
 // -------------------------------------------------------------------
-// Reactions to user input
+//  Reactions to user input:
+//  callbacks to communicate with the Controller
 // -------------------------------------------------------------------
 
 // Clicked one of the keyoard buttons.
 func (kb *keyboard) keysCB(letter rune) {
-	fmt.Printf("K: Clicked '%c'\n", letter)
+	// fmt.Printf("K: Clicked '%c'\n", letter)
 	kb.a.c.clicked(letter)
+}
+
+// -------------------------------------------------------------------
+//  Update the app UI:
+//  new state received from the controller
+// -------------------------------------------------------------------
+
+// Enable all the keyboard buttons.
+func (kb *keyboard) enableAll() {
+	for _, button := range kb.keys {
+		button.Enable()
+	}
+}
+
+// Disable the requested keyboard button.
+func (kb *keyboard) disable(letter rune) {
+	kb.keys[letter].Disable()
 }

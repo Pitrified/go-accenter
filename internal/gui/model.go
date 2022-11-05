@@ -3,9 +3,10 @@ package accenter
 import (
 	"fmt"
 	"strings"
-	"unicode/utf8"
+	"unicode"
 
 	persist "example.com/accenter/internal/persist"
+	utils "example.com/accenter/internal/utils"
 	weightedrand "example.com/accenter/internal/weightedrand"
 	wiki "example.com/accenter/pkg/wiki"
 )
@@ -14,8 +15,7 @@ type guiModel struct {
 	wr map[wiki.Word]*wiki.WikiRecord
 	iw map[wiki.Word]*weightedrand.InfoWord
 
-	secretWord wiki.Word
-	// secretWordLen int
+	secretWord  wiki.Word
 	currentWord wiki.Word
 	showWord    string
 	glossesInfo string
@@ -31,24 +31,14 @@ func newModel() *guiModel {
 
 	// pick a word to find
 	m.secretWord = weightedrand.ExtractWord(m.iw)
-	// m.secretWord = "Aborigène"
-	m.secretWord = "Azraël"
-	// m.secretWord = "no_raw_glossës"
-	// m.secretWord = "Boquériny"
-	// m.secretWordLen = utf8.RuneCountInString(string(m.secretWord))
-	// m.secretWordLen = m.secretWord.Len()
+	// m.secretWord = "Azraël"
+	m.secretWord = "no_raw_glossës"
 	m.currentWord = ""
 	m.buildShowWord()
 	m.buildAllGlosses()
-
-	fmt.Printf("sad len %+v - rune count %+v\n",
-		len(m.secretWord), utf8.RuneCountInString(string(m.secretWord)),
-	)
-
 	m.lastMistake = ' '
 
 	fmt.Printf("Picked %+v\n", m.secretWord)
-	// fmt.Printf("%+v\n", m.wr[m.secretWord].Senses[0].RawGlosses)
 	fmt.Printf("%+v\n", m.wr[m.secretWord].GetAllGlosses())
 
 	return m
@@ -64,17 +54,12 @@ func newModel() *guiModel {
 // Show the len of the word.
 func (m *guiModel) buildShowWord() {
 	// write the correct matches
-	// and we only accept a char if it's correct, so.
+	// we only accept a char if it's correct, just copy that from the secret
 	// fill with placeholders
 	// add the len hint
 
-	// m.showWord = m.currentWord
-	// currentWordLen := utf8.RuneCountInString(m.currentWord)
-	// m.showWord = string([]rune(m.secretWord)[:m.currentWord.Len()])
 	m.showWord = m.secretWord.PrefixStr(m.currentWord.Len())
 	m.showWord += strings.Repeat("_", m.secretWord.Len()-m.currentWord.Len())
-
-	// m.showWord = strings.Repeat("_", m.secretWordLen)
 	m.showWord += fmt.Sprintf(" (%d)", m.secretWord.Len())
 
 	fmt.Printf("M: built %s\n", m.showWord)
@@ -96,24 +81,41 @@ func (m *guiModel) buildAllGlosses() {
 // --------------------------------------------------------------------------------
 
 // A new letter was inserted.
+//
+// If the letter is correct add it to the current word,
+// skip next chars if they are not letters (spaces, hyphens).
+// If it's wrong, mark a flag to disable wrong buttons
 func (m *guiModel) clicked(letter rune) {
 	// fmt.Printf("M: Clicked '%c'\n", letter)
 
-	// m.currentWord += wiki.Word(letter)
-	// m.currentWord += wiki.Word(string(letter))
-	m.currentWord = m.currentWord.AppendRune(letter)
-	fmt.Printf("m.currentWord %+v\n", m.currentWord)
+	// get the next letter in the secret word
+	nextSecretRune, _ := m.secretWord.RuneAt(m.currentWord.Len())
+	// convert it to lowercase
+	nextSecretRune = unicode.ToLower(nextSecretRune)
+	// if it is correct
+	if letter == nextSecretRune {
+		m.currentWord = m.currentWord.AppendRune(letter)
+		m.lastMistake = ' '
+	} else {
+		m.lastMistake = letter
+		return
+	}
+	fmt.Printf("m.currentWord '%+v'\n", m.currentWord)
+
+	// eat the next chars if they are not letters
+	for _, letter := range m.secretWord.Suffix(m.currentWord.Len()) {
+		fmt.Printf("letter '%c'\n", letter)
+		if !utils.AllLettersSet.Contains(letter) {
+			m.currentWord = m.currentWord.AppendRune(letter)
+		} else {
+			break
+		}
+	}
 
 	if m.currentWord.Len() == m.secretWord.Len() {
 		fmt.Printf("You won!\n")
-		// should communicate this somehow
+		m.lastMistake = '!'
 	}
 
 	m.buildShowWord()
-
-	// if the letter is correct add it to the current word
-	// skip next chars if they are not letters (spaces, hyphens)
-
-	// if it's wrong, mark a flag -> will pop up a red button, possibly the keyboard one
-	// we progressively disable buttons as the user clicks the wrong ones
 }

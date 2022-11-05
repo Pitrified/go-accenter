@@ -1,7 +1,6 @@
 package accenter
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -54,11 +53,30 @@ func (c *guiController) initAll() {
 
 // A keyboard button was clicked.
 func (c *guiController) clicked(letter rune) {
-	fmt.Printf("C: Clicked '%c'\n", letter)
+	// fmt.Printf("C: Clicked '%c'\n", letter)
 	// update the model
 	c.m.clicked(letter)
+
 	// update all the pieces of the view
 	c.updateWord()
+
+	if c.m.lastMistake == ' ' {
+		// was the right letter
+		c.a.kb.enableAll()
+	} else if c.m.lastMistake == '!' {
+		// all the word is correct
+		// TODO
+		// pick the next
+		// enable all
+	} else {
+		// was the wrong letter
+		c.a.kb.disable(c.m.lastMistake)
+
+	}
+
+	// obvs should not be done here
+	// call c.a.kb.disable(letter)
+	// c.a.kb.keys[letter].Disable()
 }
 
 // --------------------------------------------------------------------------------
