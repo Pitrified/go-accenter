@@ -31,7 +31,7 @@ type guiModel struct {
 	secretWord  wiki.Word // secret word to write
 	currentChar int       // index of the next letter to write
 	showWord    string    // word to show to the user
-	hintOn      hintLevel // which kind of prompt to show
+	showHint    hintLevel // which kind of prompt to show
 	glossesInfo string    // glosses related to the word
 
 	lastMistake rune // some signal to communicate with the controller
@@ -54,7 +54,7 @@ func newModel() *guiModel {
 func (m *guiModel) pickNewSecretWord() {
 	// fmt.Printf("M: Setting hintOn to false\n")
 	// this need to happen before buildShowWord
-	m.hintOn = hintOff
+	m.showHint = hintOff
 
 	m.secretWord = weightedrand.ExtractWord(m.iw)
 	// m.secretWord = "no_raw_glossës"
@@ -85,7 +85,7 @@ func (m *guiModel) buildShowWord() {
 	// always show the real secret word we already inserted
 	m.showWord = m.secretWord.PrefixStr(m.currentChar)
 
-	switch m.hintOn {
+	switch m.showHint {
 	case hintOff:
 		// show just a placeholder char
 		m.showWord += strings.Repeat("_", m.secretWord.Len()-m.currentChar)
@@ -160,8 +160,8 @@ func (m *guiModel) clicked(letter rune) {
 
 // Clicked the button requesting a hint.
 func (m *guiModel) clickedHint() {
-	if m.hintOn < hintAll {
-		m.hintOn += 1
+	if m.showHint < hintAll {
+		m.showHint += 1
 	}
 	m.buildShowWord()
 }

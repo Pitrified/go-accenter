@@ -122,7 +122,7 @@ func loadInfoWords(infoPath string) map[wiki.Word]*weightedrand.InfoWord {
 	file, err := os.Open(infoPath)
 	if err != nil {
 		fmt.Printf("%s\n", err)
-		// TODO check if file is missing and just return empty
+		// if file is missing just return empty
 		// the error might be something else
 		return infoWords
 	}

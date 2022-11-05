@@ -23,7 +23,8 @@ import (
 // - the number of error done on this word
 // - the frequency of a word, unnormalized
 //
-// Skip a word if it's marked as useless. TODO
+// TODO Skip a word if it's marked as useless
+// TODO Save how many time a word was shown, heavily boost those at 0
 type InfoWord struct {
 	Word      wiki.Word `json:"w"`
 	Errors    int       `json:"e"`
