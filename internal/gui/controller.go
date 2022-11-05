@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
-
-	utils "example.com/accenter/internal/utils"
 )
 
 type guiController struct {
@@ -21,8 +19,6 @@ func NewController() *guiController {
 
 	c := &guiController{}
 
-	fmt.Printf("AL %+v\n", utils.AccentedLetters)
-
 	// create the view
 	c.a = newApp(c)
 
@@ -35,7 +31,7 @@ func NewController() *guiController {
 	// update all the moving parts to match the current state:
 	// the model has reasonable default values,
 	// the view has only placeholders
-	// c.initAll()
+	c.initAll()
 
 	return c
 }
@@ -44,4 +40,34 @@ func NewController() *guiController {
 func (c *guiController) Run() {
 	// run the app (will block)
 	c.a.runApp()
+}
+
+func (c *guiController) initAll() {
+	c.updateWord()
+}
+
+// --------------------------------------------------------------------------------
+//  Reacts to events from UI (the view calls these funcs from the callbacks):
+//  change the state of the model, then update the view.
+// --------------------------------------------------------------------------------
+
+// A keyboard button was clicked.
+func (c *guiController) clicked(letter rune) {
+	fmt.Printf("C: Clicked '%c'\n", letter)
+	// update the model
+	c.m.clicked(letter)
+	// update all the pieces of the view
+	c.updateWord()
+}
+
+// --------------------------------------------------------------------------------
+//  The model has changed:
+//  the controller knows which view elements must be updated.
+// --------------------------------------------------------------------------------
+
+// The word to show has changed.
+func (c *guiController) updateWord() {
+	// get the word to show from the model
+	// place it in the view
+	c.a.updateWord(c.m.showWord)
 }

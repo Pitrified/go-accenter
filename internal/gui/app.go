@@ -72,8 +72,16 @@ func (a *guiApp) buildUI() {
 
 	// ##### MAIN SCREEN #####
 	// word to find
-	a.word = widget.NewLabel("Word: .... ... ... .. .. . . (4)")
-	a.word.Alignment = fyne.TextAlignCenter
+	// a.word = widget.NewLabel("Word: .... ... ... .. .. . . (4)")
+	a.word = widget.NewLabelWithStyle(
+		"____ (4) - you actually never see this",
+		fyne.TextAlignCenter,
+		fyne.TextStyle{
+			Bold:      false,
+			Monospace: true,
+		},
+	)
+	// a.word.Alignment = fyne.TextAlignCenter
 	// meaning of the word
 	a.glosses = widget.NewLabel("Glosses:\none\ntwo\na very long gloss that explains a lot of information about the word")
 	a.glosses.Wrapping = fyne.TextWrapWord
@@ -104,4 +112,13 @@ func (a *guiApp) buildUI() {
 	)
 	a.mainWin.SetContent(borderCont)
 
+}
+
+// -------------------------------------------------------------------
+//  Update the app UI
+// -------------------------------------------------------------------
+
+// Update the word to find with the current state.
+func (a *guiApp) updateWord(word string) {
+	a.word.SetText(word)
 }

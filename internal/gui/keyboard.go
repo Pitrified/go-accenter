@@ -115,8 +115,8 @@ func (kb *keyboard) buildKeyboard() *fyne.Container {
 // Reactions to user input
 // -------------------------------------------------------------------
 
-// Clicked one of the keyoard buttons
-func (kb *keyboard) keysCB(d rune) {
-	fmt.Printf("Clicked '%c'\n", d)
-	// kb.a.c.move(d)
+// Clicked one of the keyoard buttons.
+func (kb *keyboard) keysCB(letter rune) {
+	fmt.Printf("K: Clicked '%c'\n", letter)
+	kb.a.c.clicked(letter)
 }
