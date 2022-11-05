@@ -97,12 +97,12 @@ func loadWikiRecords(wikiPath string) map[wiki.Word]wiki.WikiRecord {
 
 	scanner := bufio.NewScanner(file)
 	// optionally, resize scanner's capacity for lines over 64K
-	var result_struct wiki.WikiRecord
 	for scanner.Scan() {
+		var result_struct wiki.WikiRecord
 		line := scanner.Text()
 		json.Unmarshal([]byte(line), &result_struct)
 		if utils.IsAccentedWord(result_struct.Word) {
-			fmt.Printf("Adding %s\n", result_struct.Word)
+			// fmt.Printf("Adding %s\n", result_struct.Word)
 			wikiRecords[result_struct.Word] = result_struct
 		}
 	}
