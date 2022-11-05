@@ -1,5 +1,7 @@
 package accenter
 
+import "unicode/utf8"
+
 // Wikidictionary record.
 //
 // '#categories>#name',
@@ -45,6 +47,26 @@ type Sense struct {
 }
 
 type Word string
+
+func (w Word) Len() int {
+	return utf8.RuneCountInString(string(w))
+}
+
+func (w Word) AppendRune(r rune) Word {
+	// return w + (string(r))
+	return w + (Word(r))
+}
+
+func (w Word) Prefix(prefixLen int) Word {
+	if prefixLen < 0 || prefixLen > w.Len() {
+		return w
+	}
+	return Word([]rune(w)[:prefixLen])
+}
+
+func (w Word) PrefixStr(prefixLen int) string {
+	return string(w.Prefix(prefixLen))
+}
 
 // Get all the Glosses for this record.
 //

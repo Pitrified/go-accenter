@@ -14,12 +14,12 @@ type guiModel struct {
 	wr map[wiki.Word]*wiki.WikiRecord
 	iw map[wiki.Word]*weightedrand.InfoWord
 
-	secretWord    wiki.Word
-	secretWordLen int
-	currentWord   string
-	showWord      string
-	glossesInfo   string
-	lastMistake   rune
+	secretWord wiki.Word
+	// secretWordLen int
+	currentWord wiki.Word
+	showWord    string
+	glossesInfo string
+	lastMistake rune
 }
 
 func newModel() *guiModel {
@@ -35,7 +35,8 @@ func newModel() *guiModel {
 	m.secretWord = "Azraël"
 	// m.secretWord = "no_raw_glossës"
 	// m.secretWord = "Boquériny"
-	m.secretWordLen = utf8.RuneCountInString(string(m.secretWord))
+	// m.secretWordLen = utf8.RuneCountInString(string(m.secretWord))
+	// m.secretWordLen = m.secretWord.Len()
 	m.currentWord = ""
 	m.buildShowWord()
 	m.buildAllGlosses()
@@ -68,12 +69,13 @@ func (m *guiModel) buildShowWord() {
 	// add the len hint
 
 	// m.showWord = m.currentWord
-	currentWordLen := utf8.RuneCountInString(m.currentWord)
-	m.showWord = string([]rune(m.secretWord)[:currentWordLen])
-	m.showWord += strings.Repeat("_", m.secretWordLen-currentWordLen)
+	// currentWordLen := utf8.RuneCountInString(m.currentWord)
+	// m.showWord = string([]rune(m.secretWord)[:m.currentWord.Len()])
+	m.showWord = m.secretWord.PrefixStr(m.currentWord.Len())
+	m.showWord += strings.Repeat("_", m.secretWord.Len()-m.currentWord.Len())
 
 	// m.showWord = strings.Repeat("_", m.secretWordLen)
-	m.showWord += fmt.Sprintf(" (%d)", m.secretWordLen)
+	m.showWord += fmt.Sprintf(" (%d)", m.secretWord.Len())
 
 	fmt.Printf("M: built %s\n", m.showWord)
 }
@@ -97,11 +99,12 @@ func (m *guiModel) buildAllGlosses() {
 func (m *guiModel) clicked(letter rune) {
 	// fmt.Printf("M: Clicked '%c'\n", letter)
 
-	m.currentWord += string(letter)
+	// m.currentWord += wiki.Word(letter)
+	// m.currentWord += wiki.Word(string(letter))
+	m.currentWord = m.currentWord.AppendRune(letter)
 	fmt.Printf("m.currentWord %+v\n", m.currentWord)
 
-	currentWordLen := utf8.RuneCountInString(m.currentWord)
-	if currentWordLen == m.secretWordLen {
+	if m.currentWord.Len() == m.secretWord.Len() {
 		fmt.Printf("You won!\n")
 		// should communicate this somehow
 	}
