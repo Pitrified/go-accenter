@@ -57,26 +57,29 @@ func (c *guiController) clicked(letter rune) {
 	// update the model
 	c.m.clicked(letter)
 
-	// update all the pieces of the view
-	c.updateWord()
+	// check what the click did
+	switch c.m.lastMistake {
 
-	if c.m.lastMistake == ' ' {
-		// was the right letter
+	// was the right letter
+	case ' ':
 		c.a.kb.enableAll()
-	} else if c.m.lastMistake == '!' {
-		// all the word is correct
-		// TODO
+		c.updateWord()
+
+	// all the word is correct
+	case '!':
 		// pick the next
-		// enable all
-	} else {
-		// was the wrong letter
+		c.m.pickNewSecretWord()
+		// enable all the keys
+		c.a.kb.enableAll()
+		c.updateWord()
+		c.updateGlossesInfo()
+
+	// was the wrong letter
+	default:
 		c.a.kb.disable(c.m.lastMistake)
 
 	}
 
-	// obvs should not be done here
-	// call c.a.kb.disable(letter)
-	// c.a.kb.keys[letter].Disable()
 }
 
 // --------------------------------------------------------------------------------

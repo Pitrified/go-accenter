@@ -11,6 +11,10 @@ import (
 	wiki "example.com/accenter/pkg/wiki"
 )
 
+// --------------------------------------------------------------------------------
+//  Define and create the model
+// --------------------------------------------------------------------------------
+
 type guiModel struct {
 	wr map[wiki.Word]*wiki.WikiRecord
 	iw map[wiki.Word]*weightedrand.InfoWord
@@ -29,19 +33,24 @@ func newModel() *guiModel {
 	// load the records and the info
 	m.wr, m.iw = persist.LoadDataset()
 
-	// pick a word to find
-	m.secretWord = weightedrand.ExtractWord(m.iw)
-	// m.secretWord = "Azraël"
-	m.secretWord = "no_raw_glossës"
-	m.currentWord = ""
-	m.buildShowWord()
-	m.buildAllGlosses()
-	m.lastMistake = ' '
+	// pick the first word to find
+	m.pickNewSecretWord()
 
 	fmt.Printf("Picked %+v\n", m.secretWord)
 	fmt.Printf("%+v\n", m.wr[m.secretWord].GetAllGlosses())
 
 	return m
+}
+
+// Pick a word to find, update the relative info.
+func (m *guiModel) pickNewSecretWord() {
+	m.secretWord = weightedrand.ExtractWord(m.iw)
+	// m.secretWord = "no_raw_glossës"
+	m.secretWord = "Azraël"
+	m.currentWord = ""
+	m.buildShowWord()
+	m.buildAllGlosses()
+	m.lastMistake = ' '
 }
 
 // --------------------------------------------------------------------------------
@@ -73,7 +82,7 @@ func (m *guiModel) buildAllGlosses() {
 		thisSenseGlosses := strings.Join(sense, "\n")
 		allSensesGlosses = append(allSensesGlosses, thisSenseGlosses)
 	}
-	m.glossesInfo += strings.Join(allSensesGlosses, "\n")
+	m.glossesInfo = strings.Join(allSensesGlosses, "\n")
 }
 
 // --------------------------------------------------------------------------------
