@@ -20,10 +20,12 @@ type guiModel struct {
 	iw map[wiki.Word]*weightedrand.InfoWord
 
 	secretWord  wiki.Word
-	currentWord wiki.Word
+	currentWord wiki.Word // TODO actually useless, we only write a prefix of secret
 	showWord    string
 	glossesInfo string
 	lastMistake rune
+
+	hintOn bool
 }
 
 func newModel() *guiModel {
@@ -36,17 +38,21 @@ func newModel() *guiModel {
 	// pick the first word to find
 	m.pickNewSecretWord()
 
-	fmt.Printf("Picked %+v\n", m.secretWord)
-	fmt.Printf("%+v\n", m.wr[m.secretWord].GetAllGlosses())
+	fmt.Printf("M: Picked %+v\n", m.secretWord)
+	fmt.Printf("M: %+v\n", m.wr[m.secretWord].GetAllGlosses())
 
 	return m
 }
 
 // Pick a word to find, update the relative info.
 func (m *guiModel) pickNewSecretWord() {
+	// fmt.Printf("M: Setting hintOn to false\n")
+	// this need to happen before buildShowWord
+	m.hintOn = false
+
 	m.secretWord = weightedrand.ExtractWord(m.iw)
 	// m.secretWord = "no_raw_glossës"
-	m.secretWord = "Azraël"
+	// m.secretWord = "Azraël"
 	m.currentWord = ""
 	m.buildShowWord()
 	m.buildAllGlosses()
@@ -68,10 +74,17 @@ func (m *guiModel) buildShowWord() {
 	// add the len hint
 
 	m.showWord = m.secretWord.PrefixStr(m.currentWord.Len())
-	m.showWord += strings.Repeat("_", m.secretWord.Len()-m.currentWord.Len())
+	if m.hintOn {
+		// m.showWord = string(utils.UnaccentWord(m.secretWord))
+		suffix := m.secretWord.Suffix(m.currentWord.Len())
+		m.showWord += string(utils.UnaccentWord(suffix))
+	} else {
+		// m.showWord = m.secretWord.PrefixStr(m.currentWord.Len())
+		m.showWord += strings.Repeat("_", m.secretWord.Len()-m.currentWord.Len())
+	}
 	m.showWord += fmt.Sprintf(" (%d)", m.secretWord.Len())
 
-	fmt.Printf("M: built %s\n", m.showWord)
+	// fmt.Printf("M: built %s\n", m.showWord)
 }
 
 // Build the definition of the word.
@@ -101,19 +114,20 @@ func (m *guiModel) clicked(letter rune) {
 	nextSecretRune, _ := m.secretWord.RuneAt(m.currentWord.Len())
 	// convert it to lowercase
 	nextSecretRune = unicode.ToLower(nextSecretRune)
-	// if it is correct
-	if letter == nextSecretRune {
+	if letter == nextSecretRune { // || true {
+		// if it is correct, append it
 		m.currentWord = m.currentWord.AppendRune(letter)
 		m.lastMistake = ' '
 	} else {
+		// mark the mistake and exit, no need to update the rest
 		m.lastMistake = letter
 		return
 	}
-	fmt.Printf("m.currentWord '%+v'\n", m.currentWord)
+	// fmt.Printf("M: m.currentWord '%+v'\n", m.currentWord)
 
 	// eat the next chars if they are not letters
 	for _, letter := range m.secretWord.Suffix(m.currentWord.Len()) {
-		fmt.Printf("letter '%c'\n", letter)
+		// fmt.Printf("letter '%c'\n", letter)
 		if !utils.AllLettersSet.Contains(letter) {
 			m.currentWord = m.currentWord.AppendRune(letter)
 		} else {
@@ -122,9 +136,15 @@ func (m *guiModel) clicked(letter rune) {
 	}
 
 	if m.currentWord.Len() == m.secretWord.Len() {
-		fmt.Printf("You won!\n")
+		// fmt.Printf("M: You won!\n")
 		m.lastMistake = '!'
 	}
 
+	m.buildShowWord()
+}
+
+// Clicked the button requesting a hint.
+func (m *guiModel) clickedHint() {
+	m.hintOn = true
 	m.buildShowWord()
 }

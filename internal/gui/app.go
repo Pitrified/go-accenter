@@ -20,6 +20,8 @@ type guiApp struct {
 	word    *canvas.Text
 	glosses *widget.Label
 
+	hint *widget.Button
+
 	fyneApp fyne.App
 	mainWin fyne.Window
 }
@@ -93,10 +95,11 @@ func (a *guiApp) buildUI() {
 	// elements in the bottom of the main screen
 	labelControl := widget.NewLabel("Mock for buttons: hint, next...")
 	labelControl.Alignment = fyne.TextAlignCenter
+	a.hint = widget.NewButton("Hint", a.hintCB)
 
 	// build the main screen
 	contMain := container.NewBorder(
-		nil, labelControl, nil, nil,
+		nil, a.hint, nil, nil,
 		contWord,
 	)
 
@@ -109,7 +112,18 @@ func (a *guiApp) buildUI() {
 }
 
 // -------------------------------------------------------------------
-//  Update the app UI
+//  Reactions to user input:
+//  callbacks to communicate with the Controller
+// -------------------------------------------------------------------
+
+// Clicked the button requesting a hint.
+func (a *guiApp) hintCB() {
+	a.c.clickedHint()
+}
+
+// -------------------------------------------------------------------
+//  Update the app UI:
+//  new state received from the controller
 // -------------------------------------------------------------------
 
 // Update the word to find with the current state.

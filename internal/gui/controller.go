@@ -67,6 +67,7 @@ func (c *guiController) clicked(letter rune) {
 
 	// all the word is correct
 	case '!':
+		// fmt.Printf("C: You won!\n")
 		// pick the next
 		c.m.pickNewSecretWord()
 		// enable all the keys
@@ -80,6 +81,12 @@ func (c *guiController) clicked(letter rune) {
 
 	}
 
+}
+
+// Clicked the button requesting a hint.
+func (c *guiController) clickedHint() {
+	c.m.clickedHint()
+	c.updateWord()
 }
 
 // --------------------------------------------------------------------------------

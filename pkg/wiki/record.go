@@ -56,7 +56,6 @@ func (w Word) Len() int {
 }
 
 func (w Word) AppendRune(r rune) Word {
-	// return w + (string(r))
 	return w + (Word(r))
 }
 
@@ -79,6 +78,11 @@ func (w Word) Suffix(start int) Word {
 	return Word([]rune(w)[start:])
 }
 
+func (w Word) SuffixStr(start int) string {
+	return string(w.Suffix(start))
+}
+
+// Return the rune at the requested pos in the word.
 func (w Word) RuneAt(pos int) (rune, error) {
 	if pos < 0 || pos > w.Len() {
 		return ' ', errors.New("tried to get rune out of the word")
