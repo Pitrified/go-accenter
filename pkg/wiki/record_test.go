@@ -1,6 +1,7 @@
 package accenter
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -48,4 +49,29 @@ func Equal(t *testing.T, expected, actual, _case any) {
 		t, expected, actual,
 		fmt.Sprintf("Failed case %+v, got %+v, expected %+v", _case, actual, expected),
 	)
+}
+
+func TestWordRuneAt(t *testing.T) {
+	errEmptyWord := errors.New("empty word cannot have runes in a specific location")
+	errOutOfWord := errors.New("tried to get rune out of the word")
+	cases := []struct {
+		w   Word
+		r   rune
+		e   error
+		pos int
+	}{
+		{"", ' ', errEmptyWord, 0},
+		{"word", ' ', errOutOfWord, -1},
+		{"word", ' ', errOutOfWord, 6},
+		{"Azraël", 'A', nil, 0},
+		{"Azraël", 'ë', nil, 4},
+	}
+	for _, c := range cases {
+		gotRune, gotErr := c.w.RuneAt(c.pos)
+		if gotErr == nil {
+			Equal(t, c.r, gotRune, c)
+		} else {
+			Equal(t, c.e.Error(), gotErr.Error(), c)
+		}
+	}
 }

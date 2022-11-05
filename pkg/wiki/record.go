@@ -1,6 +1,9 @@
 package accenter
 
-import "unicode/utf8"
+import (
+	"errors"
+	"unicode/utf8"
+)
 
 // Wikidictionary record.
 //
@@ -66,6 +69,16 @@ func (w Word) Prefix(prefixLen int) Word {
 
 func (w Word) PrefixStr(prefixLen int) string {
 	return string(w.Prefix(prefixLen))
+}
+
+func (w Word) RuneAt(pos int) (rune, error) {
+	if pos < 0 || pos > w.Len() {
+		return ' ', errors.New("tried to get rune out of the word")
+	}
+	if w.Len() == 0 {
+		return ' ', errors.New("empty word cannot have runes in a specific location")
+	}
+	return []rune(w)[pos], nil
 }
 
 // Get all the Glosses for this record.
