@@ -15,6 +15,15 @@ import (
 //  Define and create the model
 // --------------------------------------------------------------------------------
 
+// Which kind of prompt to show
+type hintLevel int
+
+const (
+	hintOff     hintLevel = iota // show just a placeholder char
+	hintLetters                  // show unaccented letters
+	hintAll                      // show real letters
+)
+
 type guiModel struct {
 	wr map[wiki.Word]*wiki.WikiRecord
 	iw map[wiki.Word]*weightedrand.InfoWord
@@ -25,7 +34,7 @@ type guiModel struct {
 	glossesInfo string
 	lastMistake rune
 
-	hintOn bool
+	hintOn hintLevel
 }
 
 func newModel() *guiModel {
@@ -38,9 +47,6 @@ func newModel() *guiModel {
 	// pick the first word to find
 	m.pickNewSecretWord()
 
-	fmt.Printf("M: Picked %+v\n", m.secretWord)
-	fmt.Printf("M: %+v\n", m.wr[m.secretWord].GetAllGlosses())
-
 	return m
 }
 
@@ -48,7 +54,7 @@ func newModel() *guiModel {
 func (m *guiModel) pickNewSecretWord() {
 	// fmt.Printf("M: Setting hintOn to false\n")
 	// this need to happen before buildShowWord
-	m.hintOn = false
+	m.hintOn = hintOff
 
 	m.secretWord = weightedrand.ExtractWord(m.iw)
 	// m.secretWord = "no_raw_glossës"
@@ -57,6 +63,9 @@ func (m *guiModel) pickNewSecretWord() {
 	m.buildShowWord()
 	m.buildAllGlosses()
 	m.lastMistake = ' '
+
+	fmt.Printf("M: Picked %+v\n", m.secretWord)
+	fmt.Printf("M: %+v\n", m.wr[m.secretWord].GetAllGlosses())
 }
 
 // --------------------------------------------------------------------------------
@@ -73,15 +82,22 @@ func (m *guiModel) buildShowWord() {
 	// fill with placeholders
 	// add the len hint
 
+	// always show the real secret word we already inserted
 	m.showWord = m.secretWord.PrefixStr(m.currentWord.Len())
-	if m.hintOn {
-		// m.showWord = string(utils.UnaccentWord(m.secretWord))
+
+	switch m.hintOn {
+	case hintOff:
+		// show just a placeholder char
+		m.showWord += strings.Repeat("_", m.secretWord.Len()-m.currentWord.Len())
+	case hintLetters:
+		// show unaccented letters
 		suffix := m.secretWord.Suffix(m.currentWord.Len())
 		m.showWord += string(utils.UnaccentWord(suffix))
-	} else {
-		// m.showWord = m.secretWord.PrefixStr(m.currentWord.Len())
-		m.showWord += strings.Repeat("_", m.secretWord.Len()-m.currentWord.Len())
+	case hintAll:
+		// show real letters
+		m.showWord += m.secretWord.SuffixStr(m.currentWord.Len())
 	}
+	// add the len of the word
 	m.showWord += fmt.Sprintf(" (%d)", m.secretWord.Len())
 
 	// fmt.Printf("M: built %s\n", m.showWord)
@@ -114,7 +130,7 @@ func (m *guiModel) clicked(letter rune) {
 	nextSecretRune, _ := m.secretWord.RuneAt(m.currentWord.Len())
 	// convert it to lowercase
 	nextSecretRune = unicode.ToLower(nextSecretRune)
-	if letter == nextSecretRune { // || true {
+	if letter == nextSecretRune || true {
 		// if it is correct, append it
 		m.currentWord = m.currentWord.AppendRune(letter)
 		m.lastMistake = ' '
@@ -145,6 +161,8 @@ func (m *guiModel) clicked(letter rune) {
 
 // Clicked the button requesting a hint.
 func (m *guiModel) clickedHint() {
-	m.hintOn = true
+	if m.hintOn < hintAll {
+		m.hintOn += 1
+	}
 	m.buildShowWord()
 }

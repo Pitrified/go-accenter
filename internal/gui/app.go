@@ -20,7 +20,7 @@ type guiApp struct {
 	word    *canvas.Text
 	glosses *widget.Label
 
-	hint *widget.Button // TODO if pressed twice show the accented word
+	hint *widget.Button
 	next *widget.Button
 
 	fyneApp fyne.App
