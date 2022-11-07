@@ -53,6 +53,7 @@ func LoadDataset() (
 	return wikiRecords, infoWords
 }
 
+// TODO a function of the model
 func FindDataset(whichDataset string) string {
 	dataFol := filepath.Join("..", "..", "dataset")
 
@@ -82,6 +83,7 @@ func FindDataset(whichDataset string) string {
 }
 
 // Load the wiki records.
+// TODO a function of WikiRecords (actually NewWR() WRs)
 //
 // read a file line by line
 // https://stackoverflow.com/questions/8757389/reading-a-file-line-by-line-in-go/16615559#16615559
@@ -115,6 +117,7 @@ func loadWikiRecords(wikiPath string) map[wiki.Word]*wiki.WikiRecord {
 }
 
 // Load the info we have for each word.
+// TODO a function of InfoWords
 func loadInfoWords(infoPath string) map[wiki.Word]*InfoWord {
 	infoWords := map[wiki.Word]*InfoWord{}
 
@@ -134,6 +137,7 @@ func loadInfoWords(infoPath string) map[wiki.Word]*InfoWord {
 	return infoWords
 }
 
+// TODO a function of InfoWords
 func SaveInfoWords(infoPath string, infoWords map[wiki.Word]*InfoWord) {
 
 	fmt.Printf("Saving %d InfoWord\n", len(infoWords))
