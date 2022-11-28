@@ -15,3 +15,12 @@
 1. View with what is basically a dictionary that shows all the words with glosses/freq/errors? Sortable by error?
 1. Option to give a lot more weight to words with errors.
 1. Some way to backup the pretend database.
+1. While the user is typing, find the new word.
+   Use the old weights who cares.
+   So we can do it in the most inefficient way and the user will not notice.
+1. When inserting a correct word that had errors,
+   divide the number of errors by some factor,
+   rather than removing one.
+   If we boost the wrong words a lot you risk to make a typo
+   which will keep increasing the word weight.
+   When we learn the word we want to quickly reduce it.

@@ -13,15 +13,39 @@ import (
 	wiki "example.com/accenter/pkg/wiki"
 )
 
+// we might avoid loading the info words
+//
+// just do a query every time
+// while loading the records
+//  if the word exists:
+//     if it's not useless: load it
+//     if it is useless   : skip it
+//  if the word does not exists:
+//     create it in the database
+//
+// how to compute the weight?
+// max weight: one query sum(weights)
+// compute running sum: https://stackoverflow.com/a/58339386/20222481
+// generate random number and select the max where running is less than random
+//
+// or
+//
+// we load all the info
+//
+// if miss info while loading records: add it to the database (and the map)
+// compute the weight (while loading) and the max weight
+// generate rand [0, max weight] and range over the map, remove the weight
+// when you change a info: change the map and the database, update the max weight
+
 // Load a dataset and attach a weight to each word.
 //
 // First the info, then the words.
 // Use the info to compute the weights on the fly,
 // no need for a weighted record.
-func LoadDataset() (
-	map[wiki.Word]*wiki.WikiRecord,
-	map[wiki.Word]*InfoWord,
-) {
+//
+// A function of the model so we have access to the InfoWords
+// Named LoadWikiRecords, more specific.
+func LoadDataset() map[wiki.Word]*wiki.WikiRecord {
 
 	// wikiPath := findDataset("wikiRecords10")
 	wikiPath := FindDataset("wikiRecords1k")
@@ -33,6 +57,7 @@ func LoadDataset() (
 	fmt.Printf("Loaded %d InfoWord\n", len(infoWords))
 
 	// if we have some WikiRecord and no InfoWord for them create the default info
+	// TODO update the iws and the db
 	for word := range wikiRecords {
 		if _, ok := infoWords[word]; !ok {
 			infoWords[word] = &InfoWord{
@@ -50,10 +75,13 @@ func LoadDataset() (
 	// save the updated info
 	SaveInfoWords(infoPath, infoWords)
 
-	return wikiRecords, infoWords
+	return wikiRecords
 }
 
+// Given a dataset identifier, get the absolute path to it.
+//
 // TODO a function of the model
+// or just in utils ?
 func FindDataset(whichDataset string) string {
 	dataFol := filepath.Join("..", "..", "dataset")
 
@@ -66,6 +94,8 @@ func FindDataset(whichDataset string) string {
 		dataName = "kaikki.org-dictionary-French-1k-accent.jsonl"
 	case "infoRecords":
 		dataName = "info01.json"
+	case "infoRecordsDB":
+		dataName = "info01.db"
 	default:
 		// this is fairly bad
 		log.Fatalf("Unrecognized dataset tag to load: %s.\n", whichDataset)
@@ -83,7 +113,14 @@ func FindDataset(whichDataset string) string {
 }
 
 // Load the wiki records.
+//
 // TODO a function of WikiRecords (actually NewWR() WRs)
+// If we want to avoid loading all records,
+// we should pass a map of acceptable words.
+// But if we want to also add InfoWord for an unknown word,
+// we need to
+// * load all records, then range over them and add the word
+// * have a reference to iws inside this func
 //
 // read a file line by line
 // https://stackoverflow.com/questions/8757389/reading-a-file-line-by-line-in-go/16615559#16615559
