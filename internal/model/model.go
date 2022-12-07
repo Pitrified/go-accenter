@@ -42,12 +42,7 @@ func NewModel() *GuiModel {
 	// create the model
 	m := &GuiModel{}
 
-	// // load the info words
-	// pathDB := FindDataset("infoRecordsDB")
-	// fmt.Printf("Loading from %s\n", pathDB)
-	// m.iws = NewInfoWords(pathDB)
-	// // load the records and the info
-	// m.wr = LoadDataset()
+	// load the records and the info
 	m.rh = NewRecordHolder()
 
 	// pick the first word to find
@@ -56,28 +51,29 @@ func NewModel() *GuiModel {
 	return m
 }
 
+// --------------------------------------------------------------------------------
+//  Update the model
+// --------------------------------------------------------------------------------
+
 // Pick a word to find, update the relative info.
 func (m *GuiModel) PickNewSecretWord() {
-	// fmt.Printf("M: Setting hintOn to false\n")
+
 	// this need to happen before buildShowWord
 	m.showHint = hintOff
 
+	// pick a random word
 	m.secretWord = m.rh.ExtractRandWord()
-	fmt.Printf("M: Picked %+v\n", m.secretWord)
-
 	// m.secretWord = "no_raw_glossës"
 	// m.secretWord = "Azraël"
+	fmt.Printf("M: Picked %+v\n", m.secretWord)
+	// fmt.Printf("M: %+v\n", m.rh.wrs[m.secretWord].GetAllGlosses())
+
+	// reset the typing progress
 	m.currentChar = 0
 	m.buildShowWord()
 	m.buildAllGlosses()
 	m.LastMistake = ' '
-
-	fmt.Printf("M: %+v\n", m.rh.wrs[m.secretWord].GetAllGlosses())
 }
-
-// --------------------------------------------------------------------------------
-//  Update the model
-// --------------------------------------------------------------------------------
 
 // Build the prompt to show.
 //
@@ -114,7 +110,7 @@ func (m *GuiModel) buildShowWord() {
 func (m *GuiModel) buildAllGlosses() {
 
 	if _, ok := m.rh.wrs[m.secretWord]; !ok {
-		fmt.Printf("missing %+v in m.wr\n", m.secretWord)
+		fmt.Printf("missing %+v in m.rh.wrs\n", m.secretWord)
 		// will fail very soon
 	}
 
@@ -181,14 +177,5 @@ func (m *GuiModel) ClickedHint() {
 
 // Clicked the button to mark a word as useless.
 func (m *GuiModel) ClickedUseless() {
-	// infoPath := FindDataset("infoRecords")
-	// SaveInfoWords(infoPath, m.iws.iws)
 	m.rh.MarkUseless(m.secretWord, true)
 }
-
-// TODO move model to internal/model/model.go
-// and place persist/load.go in model/load.go (as funcs of guiModel)
-// weighted_rand split as well:
-// move extract.pick to pkg/rand
-// extract.ExtractWord to model/info_word.go
-// and extract.ComputeWeight to model/info_word.go

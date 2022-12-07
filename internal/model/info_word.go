@@ -3,8 +3,6 @@ package accenter
 import (
 	utils "example.com/accenter/internal/utils"
 	wiki "example.com/accenter/pkg/wiki"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // Information on the words.
@@ -15,16 +13,17 @@ import (
 // - number or times a word was seen, heavily boost those at 0
 // - uselessness of a word
 type InfoWord struct {
-	Word      wiki.Word `json:"w"` // the word
-	Errors    int       `json:"e"`
-	Frequency int       `json:"f"`
-	Useless   bool      `json:"u"`
-	TimesSeen int       `json:"s"`
-	HasAccent bool      `json:"a"`
+	Word      wiki.Word `gorm:"primarykey"` // the word
+	Errors    int
+	Frequency int
+	Useless   bool
+	TimesSeen int
+	HasAccent bool
+	Weight    int
 }
 
 func NewInfoWord(word wiki.Word) *InfoWord {
-	return &InfoWord{
+	iw := &InfoWord{
 		Word:      word,
 		Errors:    0,
 		Frequency: 1,
@@ -32,95 +31,39 @@ func NewInfoWord(word wiki.Word) *InfoWord {
 		TimesSeen: 0,
 		HasAccent: utils.IsAccentedWord(word),
 	}
+	iw.updateWeight()
+	return iw
 }
 
-// // given a map of InfoWord
-// // pick one according to some logic
-// //
-// // DEPRECATED: use InfoWords.ExtractWord()
-// func ExtractWord(m map[wiki.Word]*InfoWord) wiki.Word {
-// 	return rand.Pick(m)
-// }
-
-// // A collection of InfoWord.
-// //
-// // With facilities to read/write InfoWords.
-// type InfoWords struct {
-// 	iws map[wiki.Word]*InfoWord
-// 	db  *sql.DB
-// }
+// Update the InfoWord weight according to the current state.
 //
-// // Load the info words in the given location.
-// func NewInfoWords(pathDB string) *InfoWords {
-//
-// 	// create the info word holder
-// 	iws := &InfoWords{}
-//
-// 	// open the database for the InfoWords
-// 	db, err := sql.Open("sqlite3", pathDB)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	iws.db = db
-//
-// 	// create database table if not exists
-// 	createStr := `CREATE TABLE IF NOT EXISTS infowords (
-//         word TEXT PRIMARY KEY,
-//         errors INTEGER,
-//         frequency INTEGER,
-//         useless BOOLEAN,
-//         timesseen INTEGER
-//     );`
-// 	_, err = db.Exec(createStr)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-//
-// 	// load all words
-//
-// 	return iws
-// }
+// Return the delta weight.
+func (iw *InfoWord) updateWeight() int {
+	oldWeight := iw.Weight
 
-// // Pick a random word according to the weights.
-// //
-// // PickWeighted still lives in rand.extract.
-// func (iws *InfoWords) ExtractRandWord() wiki.Word {
-// 	// the weights are maintained in iws
-// 	// the interface of Pick is still to be defined
-// 	return rand.Pick(iws.iws)
-// }
+	if iw.Useless {
+		iw.Weight = 0
+		return oldWeight
+	}
 
-// // Add an error to the requested word.
-// //
-// // MAYBE also remove the errors.
-// func (iws *InfoWords) AddError(word wiki.Word) {
-// 	iws.iws[word].Errors += 1
-// 	// TODO write to database
-// 	// TODO recompute weights
-// }
+	// TODO actually implement it
+	iw.Weight = 1
 
-// // Set the useless state of the word.
-// func (iws *InfoWords) MarkUseless(word wiki.Word, useless bool) {
-// 	iws.iws[word].Useless = useless
-// 	// TODO write to database
-// 	// TODO recompute weights
-// }
+	return iw.Weight - oldWeight
+}
 
-// do not recompute everything, we know the old weight,
-// so just update the total with the delta
-// so we just need to call the `ComputeWeight` func once
-// but remember that we might have suddenly useless words
-// that simply will have 0 weight so we solve it
+// Add an error to the word.
+//
+// Return the delta weight.
+func (iw *InfoWord) AddError() int {
+	iw.Errors += 1
+	return iw.updateWeight()
+}
 
-// // Load a map with the useful InfoWords.
-// //
-// // We make a InfoWords type,
-// // that will have this method and hold the map of IWs.
-// //
-// // DEPRECATED: use NewInfoWords
-// func (iw *InfoWord) Map() map[wiki.Word]InfoWord {
-// 	iws := map[wiki.Word]InfoWord{}
-// 	// query all the words
-// 	// where useless is false
-// 	return iws
-// }
+// Mark a word as useless.
+//
+// Return the delta weight.
+func (iw *InfoWord) MarkUseless() int {
+	iw.Useless = true
+	return iw.updateWeight()
+}

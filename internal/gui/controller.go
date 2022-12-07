@@ -119,7 +119,7 @@ func (c *guiController) updateWord() {
 
 // The word info to show has changed.
 func (c *guiController) updateGlossesInfo() {
-	// get the word to show from the model
+	// get the word description to show from the model
 	// place it in the view
 	c.a.updateGlossesInfo(c.m.GlossesInfo)
 }
