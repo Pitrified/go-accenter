@@ -23,8 +23,7 @@ const (
 )
 
 type GuiModel struct {
-	wr  map[wiki.Word]*wiki.WikiRecord
-	iws *InfoWords
+	rh *RecordHolder
 
 	secretWord  wiki.Word // secret word to write
 	currentChar int       // index of the next letter to write
@@ -32,6 +31,10 @@ type GuiModel struct {
 	showHint    hintLevel // which kind of prompt to show
 	GlossesInfo string    // glosses related to the word
 
+	// TODO: might be a iota? with named states of what happened after the last click
+	// we need to know which was the last letter but in the controller we
+	// literally receive clicked(letter rune) so it's right there
+	// also the state should kinda not live in the view, who knows
 	LastMistake rune // some signal to communicate with the controller
 }
 
@@ -39,13 +42,13 @@ func NewModel() *GuiModel {
 	// create the model
 	m := &GuiModel{}
 
-	// load the info words
-	pathDB := FindDataset("infoRecordsDB")
-	fmt.Printf("Loading from %s\n", pathDB)
-	m.iws = NewInfoWords(pathDB)
-
-	// load the records and the info
-	m.wr = LoadDataset()
+	// // load the info words
+	// pathDB := FindDataset("infoRecordsDB")
+	// fmt.Printf("Loading from %s\n", pathDB)
+	// m.iws = NewInfoWords(pathDB)
+	// // load the records and the info
+	// m.wr = LoadDataset()
+	m.rh = NewRecordHolder()
 
 	// pick the first word to find
 	m.PickNewSecretWord()
@@ -59,7 +62,7 @@ func (m *GuiModel) PickNewSecretWord() {
 	// this need to happen before buildShowWord
 	m.showHint = hintOff
 
-	m.secretWord = m.iws.ExtractWord()
+	m.secretWord = m.rh.ExtractRandWord()
 	fmt.Printf("M: Picked %+v\n", m.secretWord)
 
 	// m.secretWord = "no_raw_glossës"
@@ -69,7 +72,7 @@ func (m *GuiModel) PickNewSecretWord() {
 	m.buildAllGlosses()
 	m.LastMistake = ' '
 
-	fmt.Printf("M: %+v\n", m.wr[m.secretWord].GetAllGlosses())
+	fmt.Printf("M: %+v\n", m.rh.wrs[m.secretWord].GetAllGlosses())
 }
 
 // --------------------------------------------------------------------------------
@@ -110,12 +113,12 @@ func (m *GuiModel) buildShowWord() {
 // Build the definition of the word.
 func (m *GuiModel) buildAllGlosses() {
 
-	if _, ok := m.wr[m.secretWord]; !ok {
+	if _, ok := m.rh.wrs[m.secretWord]; !ok {
 		fmt.Printf("missing %+v in m.wr\n", m.secretWord)
 		// will fail very soon
 	}
 
-	allGlosses := m.wr[m.secretWord].GetAllGlosses()
+	allGlosses := m.rh.wrs[m.secretWord].GetAllGlosses()
 	allSensesGlosses := make([]string, 5)
 	for _, sense := range allGlosses {
 		thisSenseGlosses := strings.Join(sense, "\n")
@@ -178,8 +181,9 @@ func (m *GuiModel) ClickedHint() {
 
 // Clicked the button to mark a word as useless.
 func (m *GuiModel) ClickedUseless() {
-	infoPath := FindDataset("infoRecords")
-	SaveInfoWords(infoPath, m.iws.iws)
+	// infoPath := FindDataset("infoRecords")
+	// SaveInfoWords(infoPath, m.iws.iws)
+	m.rh.MarkUseless(m.secretWord, true)
 }
 
 // TODO move model to internal/model/model.go
