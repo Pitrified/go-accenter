@@ -76,6 +76,8 @@ func NewRecordHolder() *RecordHolder {
 		// copy the word in a new location
 		iwc := iw
 		rh.iws[iw.Word] = &iwc
+		// the weight func might have changed so just recompute it
+		iwc.updateWeight()
 	}
 
 	// load the useful WikiRecords
@@ -190,6 +192,8 @@ func (rh *RecordHolder) UpdateWord(word wiki.Word) {
 
 	// https://gorm.io/docs/update.html#Save-All-Fields
 	rh.db.Save(*rh.iws[word])
+
+	log.Printf("InfoWord total weight %d", rh.totalWeight)
 
 	// https://gorm.io/docs/update.html#Update-Selected-Fields
 	// we could use this to specifically update only the changed fields

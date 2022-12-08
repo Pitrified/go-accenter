@@ -41,13 +41,27 @@ func NewInfoWord(word wiki.Word) *InfoWord {
 func (iw *InfoWord) updateWeight() int {
 	oldWeight := iw.Weight
 
+	// never show useless words
 	if iw.Useless {
 		iw.Weight = 0
-		return oldWeight
+		return iw.Weight - oldWeight
 	}
 
-	// TODO actually implement it
-	iw.Weight = 1
+	// show unseen words very often
+	if iw.TimesSeen == 0 {
+		iw.Weight = 100
+		return iw.Weight - oldWeight
+	}
+
+	// boost words with errors
+	// as a words is seen more often, show it less
+	// MAYBE do 10/(TimesSeen-Errors) to boost errors even more
+	iw.Weight = int(10/iw.TimesSeen + (iw.Errors * 5))
+
+	// has to be at least one
+	if iw.Weight == 0 {
+		iw.Weight = 1
+	}
 
 	return iw.Weight - oldWeight
 }
