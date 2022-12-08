@@ -135,7 +135,14 @@ func NewRecordHolder() *RecordHolder {
 func (rh *RecordHolder) ExtractRandWord() wiki.Word {
 	// the weights are maintained in iws
 	// the interface of Pick is still to be defined
-	return rand.Pick(rh.iws)
+
+	// return rand.Pick(rh.iws)
+
+	return rand.PickMap(
+		rh.iws,
+		func(iw *InfoWord) int { return iw.Weight },
+		rh.totalWeight,
+	)
 }
 
 // Add an error to the requested word.

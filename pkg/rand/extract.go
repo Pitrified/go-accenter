@@ -17,3 +17,17 @@ func Pick[K comparable, V any](m map[K]V) K {
 	}
 	panic("unreachable")
 }
+
+// Pick a random key in a map, according to the weights returned by getWeight.
+func PickMap[K comparable, V any](
+	m map[K]V, getWeight func(V) int, totalWeight int,
+) K {
+	i := rand.Intn(totalWeight)
+	for k, v := range m {
+		i -= getWeight(v)
+		if i < 0 {
+			return k
+		}
+	}
+	panic("unreachable")
+}
