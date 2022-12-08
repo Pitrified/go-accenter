@@ -108,7 +108,7 @@ func NewRecordHolder() *RecordHolder {
 		}
 		// if it has accent and is not useless, we save it
 		// if rh.iws[wr.Word].HasAccent && !rh.iws[wr.Word].Useless {
-		if !rh.iws[wr.Word].Useless {
+		if rh.IsInteresting(wr.Word) {
 			// fmt.Printf("Adding %s\n", wr.Word)
 			rh.wrs[wr.Word] = &wr
 		}
@@ -116,17 +116,26 @@ func NewRecordHolder() *RecordHolder {
 
 	log.Printf("Loaded %d WikiRecords", len(rh.wrs))
 
-	// TODO the weight of a useless or non-accented word will be 0
-	// but we still waste time iterating over it
-	// so it makes sense to only keep loaded the active words
-
+	// the weight of a non-interesting word will be 0 but we still waste time
+	// iterating over it so only keep the active words
 	for _, iw := range rh.iws {
-		fmt.Printf("have %s\n", iw.Word)
+		// fmt.Printf("have %s\n", iw.Word)
+		if !rh.IsInteresting(iw.Word) {
+			delete(rh.iws, iw.Word)
+			fmt.Printf("Deleting %s\n", iw.Word)
+			continue
+		}
+		// fmt.Printf("Adding weight %s\n", wr.Word)
 		rh.totalWeight += iw.Weight
 	}
 	log.Printf("InfoWord total weight %d", rh.totalWeight)
 
 	return rh
+}
+
+// Decide if an InfoWord is interesting.
+func (rh *RecordHolder) IsInteresting(word wiki.Word) bool {
+	return (rh.iws[word].HasAccent && !rh.iws[word].Useless)
 }
 
 // Pick a random word according to the weights.
