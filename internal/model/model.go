@@ -36,6 +36,7 @@ type GuiModel struct {
 	// literally receive clicked(letter rune) so it's right there
 	// also the state should kinda not live in the view, who knows
 	LastMistake rune // some signal to communicate with the controller
+	didMistake  bool // true when a mistake was made on the current word
 }
 
 func NewModel() *GuiModel {
@@ -73,6 +74,7 @@ func (m *GuiModel) PickNewSecretWord() {
 	m.buildShowWord()
 	m.buildAllGlosses()
 	m.LastMistake = ' '
+	m.didMistake = false
 }
 
 // Build the prompt to show.
@@ -95,10 +97,10 @@ func (m *GuiModel) buildShowWord() {
 	case hintLetters:
 		// show unaccented letters
 		suffix := m.secretWord.Suffix(m.currentChar)
-		m.ShowWord += string(utils.UnaccentWord(suffix))
+		m.ShowWord += "|" + string(utils.UnaccentWord(suffix))
 	case hintAll:
 		// show real letters
-		m.ShowWord += m.secretWord.SuffixStr(m.currentChar)
+		m.ShowWord += "|" + m.secretWord.SuffixStr(m.currentChar)
 	}
 	// add the len of the word
 	m.ShowWord += fmt.Sprintf(" (%d)", m.secretWord.Len())
@@ -139,13 +141,17 @@ func (m *GuiModel) Clicked(letter rune) {
 	nextSecretRune, _ := m.secretWord.RuneAt(m.currentChar)
 	// convert it to lowercase
 	nextSecretRune = unicode.ToLower(nextSecretRune)
-	if letter == nextSecretRune || true {
+	if letter == nextSecretRune {
 		// if it is correct, append it
 		m.currentChar += 1
 		m.LastMistake = ' '
 	} else {
 		// mark the mistake and exit, no need to update the rest
 		m.LastMistake = letter
+		if !m.didMistake {
+			m.rh.AddError(m.secretWord)
+			m.didMistake = true
+		}
 		return
 	}
 
@@ -162,6 +168,9 @@ func (m *GuiModel) Clicked(letter rune) {
 	if m.currentChar == m.secretWord.Len() {
 		// fmt.Printf("M: You won!\n")
 		m.LastMistake = '!'
+		if !m.didMistake {
+			m.rh.RemoveError(m.secretWord)
+		}
 	}
 
 	m.buildShowWord()

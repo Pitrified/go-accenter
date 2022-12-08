@@ -60,10 +60,28 @@ func (iw *InfoWord) AddError() int {
 	return iw.updateWeight()
 }
 
+// Remove an error from the word.
+//
+// Return the delta weight.
+func (iw *InfoWord) RemoveError() int {
+	if iw.Errors > 0 {
+		iw.Errors -= 1
+	}
+	return iw.updateWeight()
+}
+
 // Mark a word as useless.
 //
 // Return the delta weight.
 func (iw *InfoWord) MarkUseless() int {
 	iw.Useless = true
+	return iw.updateWeight()
+}
+
+// The word was seen.
+//
+// Return the delta weight.
+func (iw *InfoWord) Seen() int {
+	iw.TimesSeen += 1
 	return iw.updateWeight()
 }

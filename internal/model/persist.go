@@ -147,27 +147,40 @@ func (rh *RecordHolder) ExtractRandWord() wiki.Word {
 
 	// return rand.Pick(rh.iws)
 
-	return rand.PickMap(
+	// pick the word
+	word := rand.PickMap(
 		rh.iws,
 		func(iw *InfoWord) int { return iw.Weight },
 		rh.totalWeight,
 	)
+
+	// mark as seen, update weight, write to DB
+	rh.totalWeight += rh.iws[word].Seen()
+	rh.UpdateWord(word)
+
+	return word
 }
 
 // Add an error to the requested word.
-//
-// MAYBE also remove the errors.
 func (rh *RecordHolder) AddError(word wiki.Word) {
-	deltaWeight := rh.iws[word].AddError()
-	rh.totalWeight += deltaWeight
+	// track the new total weight
+	rh.totalWeight += rh.iws[word].AddError()
+	// write to database
+	rh.UpdateWord(word)
+}
+
+// Remove an error from the requested word.
+func (rh *RecordHolder) RemoveError(word wiki.Word) {
+	// track the new total weight
+	rh.totalWeight += rh.iws[word].RemoveError()
 	// write to database
 	rh.UpdateWord(word)
 }
 
 // Set the useless state of the word.
 func (rh *RecordHolder) MarkUseless(word wiki.Word, useless bool) {
-	deltaWeight := rh.iws[word].MarkUseless()
-	rh.totalWeight += deltaWeight
+	// track the new total weight
+	rh.totalWeight += rh.iws[word].MarkUseless()
 	// write to database
 	rh.UpdateWord(word)
 }
@@ -178,12 +191,9 @@ func (rh *RecordHolder) UpdateWord(word wiki.Word) {
 	// https://gorm.io/docs/update.html#Save-All-Fields
 	rh.db.Save(*rh.iws[word])
 
-	// // https://gorm.io/docs/update.html#Update-Selected-Fields
-	// // we could use this to specifically update only the changed fields
-	// rh.db.
-	// 	Model(&InfoWord{Word: word}).
-	// 	Select("*").
-	// 	Updates(*rh.iws[word])
+	// https://gorm.io/docs/update.html#Update-Selected-Fields
+	// we could use this to specifically update only the changed fields
+	// but seems like an hassle
 
 }
 

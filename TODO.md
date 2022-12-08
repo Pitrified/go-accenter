@@ -1,5 +1,6 @@
 # TODO and ideas
 
+1. IPA pronunciation
 1. Filter out words very similar to English.
 1. Optional accent filter.
 1. Cluster by categories.
