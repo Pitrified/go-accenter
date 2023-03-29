@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode"
 
-	"accenter/internal/utils"
+	"accenter/internal/diacritic"
 	"accenter/pkg/wiki"
 )
 
@@ -97,7 +97,7 @@ func (m *GuiModel) buildShowWord() {
 	case hintLetters:
 		// show unaccented letters
 		suffix := m.secretWord.Suffix(m.currentChar)
-		m.ShowWord += "|" + string(utils.UnaccentWord(suffix))
+		m.ShowWord += "|" + string(diacritic.UnaccentWord(suffix))
 	case hintAll:
 		// show real letters
 		m.ShowWord += "|" + m.secretWord.SuffixStr(m.currentChar)
@@ -158,7 +158,7 @@ func (m *GuiModel) Clicked(letter rune) {
 	// eat the next chars if they are not letters
 	for _, letter := range m.secretWord.Suffix(m.currentChar) {
 		// fmt.Printf("letter '%c'\n", letter)
-		if !utils.AllLettersSet.Contains(letter) {
+		if !diacritic.AllLettersSet.Contains(letter) {
 			m.currentChar += 1
 		} else {
 			break

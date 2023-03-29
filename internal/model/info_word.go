@@ -1,7 +1,7 @@
 package model
 
 import (
-	"accenter/internal/utils"
+	"accenter/internal/diacritic"
 	"accenter/pkg/wiki"
 )
 
@@ -29,7 +29,7 @@ func NewInfoWord(word wiki.Word) *InfoWord {
 		Frequency: 1,
 		Useless:   false,
 		TimesSeen: 0,
-		HasAccent: utils.IsAccentedWord(word),
+		HasAccent: diacritic.IsAccentedWord(word),
 	}
 	iw.updateWeight()
 	return iw

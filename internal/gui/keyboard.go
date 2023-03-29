@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"unicode"
 
-	"accenter/internal/utils"
+	"accenter/internal/diacritic"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -30,7 +30,7 @@ func (kb *keyboard) buildKeyboard() *fyne.Container {
 	// allLetters := "âàéèëêïîôœüùûçqwertyuiopasdfghjklzxcvbnm"
 	kb.keys = make(map[rune]*widget.Button)
 
-	for _, letter := range utils.AllLetters {
+	for _, letter := range diacritic.AllLetters {
 		letter := letter
 		kb.keys[letter] = widget.NewButton(
 			fmt.Sprintf("%c", unicode.ToUpper(letter)),
