@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"unicode"
 
-	"accenter/internal/diacritic"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -15,7 +13,8 @@ import (
 type keyboard struct {
 	a *guiApp
 
-	keys map[rune]*widget.Button
+	keys   [][]*widget.Button
+	layout [][]rune
 }
 
 // Create a new keyboard.
@@ -27,94 +26,39 @@ func newKeyboard(a *guiApp) *keyboard {
 // àÀ âÂ éÉ èÈ êÊ ëË îÎ ïÏ œŒ ôÔ ùÙ ûÛ üÜ çÇ « » €
 func (kb *keyboard) buildKeyboard() *fyne.Container {
 
-	// allLetters := "âàéèëêïîôœüùûçqwertyuiopasdfghjklzxcvbnm"
-	kb.keys = make(map[rune]*widget.Button)
-
-	for _, letter := range diacritic.AllLetters {
-		letter := letter
-		kb.keys[letter] = widget.NewButton(
-			fmt.Sprintf("%c", unicode.ToUpper(letter)),
-			func() { kb.keysCB(letter) },
-		)
+	// TODO: sanity check that all letters are present
+	kb.layout = [][]rune{
+		{'â', 'à', 'é', 'è', 'ë', 'ê'},
+		{'ï', 'î', 'ô', 'œ', 'ü', 'ù', 'û', 'ç'},
+		{'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'},
+		{'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'},
+		{'z', 'x', 'c', 'v', 'b', 'n', 'm'},
 	}
 
-	contKeys := container.NewVBox(
-		container.NewCenter(
-			container.NewHBox(
-				container.NewGridWithColumns(
-					6,
-					kb.keys['â'],
-					kb.keys['à'],
-					kb.keys['é'],
-					kb.keys['è'],
-					kb.keys['ë'],
-					kb.keys['ê'],
-				),
+	// create the buttons
+	kb.keys = make([][]*widget.Button, len(kb.layout))
+	for i := range kb.layout {
+		kb.keys[i] = make([]*widget.Button, len(kb.layout[i]))
+		for j := range kb.layout[i] {
+			letter := kb.layout[i][j]
+			kb.keys[i][j] = widget.NewButton(
+				fmt.Sprintf("%c", unicode.ToUpper(letter)),
+				func() { kb.keysCB(letter) },
+			)
+		}
+	}
+
+	// create the keyboard
+	rows := make([]fyne.CanvasObject, len(kb.keys))
+	for i := range kb.keys {
+		rows[i] = container.NewCenter(
+			container.NewGridWithColumns(
+				len(kb.keys[i]),
+				ToCO(kb.keys[i]...)...,
 			),
-		),
-		container.NewCenter(
-			container.NewHBox(
-				container.NewGridWithColumns(
-					8,
-					kb.keys['ï'],
-					kb.keys['î'],
-					kb.keys['ô'],
-					kb.keys['œ'],
-					kb.keys['ü'],
-					kb.keys['ù'],
-					kb.keys['û'],
-					kb.keys['ç'],
-				),
-			),
-		),
-		container.NewCenter(
-			container.NewHBox(
-				container.NewGridWithColumns(
-					10,
-					kb.keys['q'],
-					kb.keys['w'],
-					kb.keys['e'],
-					kb.keys['r'],
-					kb.keys['t'],
-					kb.keys['y'],
-					kb.keys['u'],
-					kb.keys['i'],
-					kb.keys['o'],
-					kb.keys['p'],
-				),
-			),
-		),
-		container.NewCenter(
-			container.NewHBox(
-				container.NewGridWithColumns(
-					9,
-					kb.keys['a'],
-					kb.keys['s'],
-					kb.keys['d'],
-					kb.keys['f'],
-					kb.keys['g'],
-					kb.keys['h'],
-					kb.keys['j'],
-					kb.keys['k'],
-					kb.keys['l'],
-				),
-			),
-		),
-		container.NewCenter(
-			container.NewHBox(
-				container.NewGridWithColumns(
-					7,
-					kb.keys['z'],
-					kb.keys['x'],
-					kb.keys['c'],
-					kb.keys['v'],
-					kb.keys['b'],
-					kb.keys['n'],
-					kb.keys['m'],
-				),
-			),
-		),
-	)
+		)
+	}
+	contKeys := container.NewVBox(rows...)
 
 	return contKeys
 }
@@ -137,19 +81,32 @@ func (kb *keyboard) keysCB(letter rune) {
 
 // Enable all the keyboard buttons.
 func (kb *keyboard) enableAll() {
-	for _, button := range kb.keys {
-		button.Enable()
+	for i := range kb.keys {
+		for j := range kb.keys[i] {
+			button := kb.keys[i][j]
+			button.Enable()
+		}
 	}
 }
 
 // Disable all the keyboard buttons.
 func (kb *keyboard) disableAll() {
-	for _, button := range kb.keys {
-		button.Disable()
+	for i := range kb.keys {
+		for j := range kb.keys[i] {
+			button := kb.keys[i][j]
+			button.Disable()
+		}
 	}
 }
 
 // Disable the requested keyboard button.
 func (kb *keyboard) disable(letter rune) {
-	kb.keys[letter].Disable()
+	for i := range kb.layout {
+		for j := range kb.layout[i] {
+			if kb.layout[i][j] == letter {
+				kb.keys[i][j].Disable()
+				return
+			}
+		}
+	}
 }
