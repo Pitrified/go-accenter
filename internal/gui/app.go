@@ -91,7 +91,6 @@ func (a *guiApp) buildUI() {
 		layout.NewSpacer(),
 		a.word,
 		a.glosses,
-		layout.NewSpacer(),
 	)
 
 	// elements in the bottom of the main screen
