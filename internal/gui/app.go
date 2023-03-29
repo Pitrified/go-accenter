@@ -1,4 +1,4 @@
-package accenter
+package gui
 
 import (
 	"fmt"

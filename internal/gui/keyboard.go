@@ -1,10 +1,10 @@
-package accenter
+package gui
 
 import (
 	"fmt"
 	"unicode"
 
-	utils "example.com/accenter/internal/utils"
+	"accenter/internal/utils"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"

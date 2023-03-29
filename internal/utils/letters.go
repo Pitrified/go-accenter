@@ -1,10 +1,10 @@
-package accenter
+package utils
 
 import (
 	"strings"
 	"unicode"
 
-	wiki "example.com/accenter/pkg/wiki"
+	"accenter/pkg/wiki"
 
 	mapset "github.com/deckarep/golang-set/v2"
 )

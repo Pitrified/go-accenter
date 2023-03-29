@@ -1,4 +1,4 @@
-package accenter
+package wiki
 
 import (
 	"errors"

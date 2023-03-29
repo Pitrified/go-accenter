@@ -1,8 +1,8 @@
-package accenter
+package model
 
 import (
-	utils "example.com/accenter/internal/utils"
-	wiki "example.com/accenter/pkg/wiki"
+	"accenter/internal/utils"
+	"accenter/pkg/wiki"
 )
 
 // Information on the words.

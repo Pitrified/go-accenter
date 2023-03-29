@@ -1,4 +1,4 @@
-package accenter
+package model
 
 import (
 	"bufio"
@@ -9,8 +9,9 @@ import (
 	"path/filepath"
 	"time"
 
-	rand "example.com/accenter/pkg/rand"
-	wiki "example.com/accenter/pkg/wiki"
+	"accenter/pkg/pick"
+	"accenter/pkg/wiki"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -150,7 +151,7 @@ func (rh *RecordHolder) ExtractRandWord() wiki.Word {
 	// return rand.Pick(rh.iws)
 
 	// pick the word
-	word := rand.PickMap(
+	word := pick.PickMap(
 		rh.iws,
 		func(iw *InfoWord) int { return iw.Weight },
 		rh.totalWeight,

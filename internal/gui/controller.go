@@ -1,10 +1,10 @@
-package accenter
+package gui
 
 import (
 	"math/rand"
 	"time"
 
-	model "example.com/accenter/internal/model"
+	"accenter/internal/model"
 )
 
 type guiController struct {

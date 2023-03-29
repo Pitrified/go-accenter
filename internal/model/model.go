@@ -1,12 +1,12 @@
-package accenter
+package model
 
 import (
 	"fmt"
 	"strings"
 	"unicode"
 
-	utils "example.com/accenter/internal/utils"
-	wiki "example.com/accenter/pkg/wiki"
+	"accenter/internal/utils"
+	"accenter/pkg/wiki"
 )
 
 // --------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-package accenter
+package pick
 
 import (
 	"math/rand"

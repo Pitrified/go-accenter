@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	gui "example.com/accenter/internal/gui"
+	"accenter/internal/gui"
 )
 
 func main() {
